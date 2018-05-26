@@ -8,9 +8,11 @@ public class EnergyShot : MonoBehaviour {
    public int damage;
 
    private Animator animator;
+   private CircleCollider2D circleCollider;
 
    void Start() {
       animator = GetComponent<Animator> ();
+      circleCollider = GetComponent<CircleCollider2D> ();
    }
 
    void FixedUpdate () {
@@ -21,12 +23,17 @@ public class EnergyShot : MonoBehaviour {
       if (other.CompareTag ("Damageable")) {
          IDamageable hitObject = other.GetComponent<IDamageable> ();
          hitObject.DealDamage (damage);
-         animator.SetTrigger ("Explode"); //Event trigger at end calls EndExplode
-         speed = 0;
+         StartExplode ();
       } else if (other.CompareTag ("Obstacle")) {
-         animator.SetTrigger ("Explode"); //Event trigger at end calls EndExplode
-         speed = 0;
+         StartExplode ();
       }
+   }
+
+   //The shot has hit something, and so begins to dissipate.
+   private void StartExplode() {
+      animator.SetTrigger ("Explode"); //Event trigger at end calls EndExplode
+      speed = 0;
+      circleCollider.enabled = false;
    }
 
    private void EndExplode() {

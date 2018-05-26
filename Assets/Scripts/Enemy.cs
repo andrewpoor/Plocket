@@ -17,8 +17,11 @@ public abstract class Enemy : MonoBehaviour, IDamageable {
       health -= damage;
 
       if (health <= 0) {
+         Debug.Log ("Gets here.");
          GetComponent<PolygonCollider2D> ().enabled = false;
-         animator.SetTrigger ("EnemyExplode"); //Event trigger at end calls OnDestruction
+         animator.SetTrigger ("Explode"); //Event trigger at end calls OnDestruction
+      } else {
+         animator.SetTrigger ("Damage");
       }
    }
 

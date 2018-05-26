@@ -12,6 +12,7 @@ public class PlayerController : MonoBehaviour {
    public float rotationSpeed;
    public LayerMask blockingLayer;
    public int laserDamage;
+   public int shotDamage;
    public float pullToExitSpeed; //Speed at which the player is pulled to the exit upon touching it.
    public float shotRechargeDelay;
 
@@ -67,14 +68,12 @@ public class PlayerController : MonoBehaviour {
    //Until the player has pressed a button to start, the rocket should remain still.
    //Once ready, the rocket will begin to accelerate and control is granted to the player.
    private IEnumerator WaitUntilPlayerReady() {
-      while (!playerReady) {
-         if (Input.GetButtonDown("Fire1")) {
-            playerReady = true;
-            StartCoroutine (Accelerate ());
-         }
+      while (!Input.GetButtonDown ("Fire1")) {
          yield return null;
       }
 
+      playerReady = true;
+      StartCoroutine (Accelerate ());
       yield return null;
    }
 
@@ -93,6 +92,7 @@ public class PlayerController : MonoBehaviour {
 
    //Fire a laser in the direction the rocket is pointing.
    //Begins a cooldown during which the laser can't be fired again.
+   //NOTE: Not currently in use.
    private void ShootLaser() {
       laserReady = false;
       RaycastHit2D hit = Physics2D.Raycast (transform.position, transform.up, 100.0f, blockingLayer);
@@ -105,10 +105,6 @@ public class PlayerController : MonoBehaviour {
          }
       }
 
-      BeginLaserCooldown ();
-   }
-
-   private void BeginLaserCooldown() {
       laserCooldown.StartCooldown ();
    }
 
@@ -116,6 +112,7 @@ public class PlayerController : MonoBehaviour {
       laserReady = true;
    }
 
+   //Draws a temporary line on screen between start and end.
    private void DrawLine(Vector2 start, Vector2 end, Color color, float duration, float width)
    {
       GameObject lineHolder = new GameObject();
@@ -135,10 +132,12 @@ public class PlayerController : MonoBehaviour {
       GameObject.Destroy(lineHolder, duration);
    }
 
+   //Fires a shot towards the current mouse position, independant of the rocket's orientation.
    private void ShootEnergyShot() {
       Vector2 shotOrigin = transform.position + transform.rotation * shotOffset;
       Vector2 originToMouse = Input.mousePosition - Camera.main.WorldToScreenPoint (shotOrigin); //Vector towards mouse in screen space.
       GameObject shot = Instantiate(energyShotPrefab, shotOrigin, Quaternion.FromToRotation(Vector2.up, originToMouse));
+      shot.GetComponent<EnergyShot> ().damage = shotDamage;
       shotReady = false;
       Invoke ("RechargeEnergyShot", shotRechargeDelay);
    }
@@ -161,7 +160,7 @@ public class PlayerController : MonoBehaviour {
       laserReady = false;
       polygonCollider.enabled = false;
       laserCooldown.gameObject.SetActive(false);
-      animator.SetTrigger ("PlocketExplode"); //Event trigger at end calls EndDestruction
+      animator.SetTrigger ("Explode"); //Event trigger at end calls EndDestruction
    }
 
    //Called after the exploding animation has finished.
@@ -190,12 +189,8 @@ public class PlayerController : MonoBehaviour {
          yield return null;
       }
 
-      StartExitAnimation ();
+      animator.SetTrigger ("Exit"); //Event trigger at end calls EndExitReached
       yield return null;
-   }
-
-   private void StartExitAnimation() {
-      animator.SetTrigger ("PlocketExit"); //Event trigger at end calls EndExitReached
    }
 
    private void EndExitReached() {

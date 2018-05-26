@@ -20,7 +20,7 @@ public class GameManager : MonoBehaviour {
    public Text title;
    public Text subtitle;
 
-   public Texture2D cursorTexture;
+   public Texture2D cursorTexture; //A crosshair cursor.
 
    private Exit exit;
    private List<Enemy> enemies;
@@ -39,6 +39,9 @@ public class GameManager : MonoBehaviour {
       Cursor.SetCursor (cursorTexture, new Vector2 (cursorTexture.width / 2.0f, cursorTexture.height / 2.0f), CursorMode.Auto);
    }
 
+   //When a new scene is loaded, the exit registers itself with the game manager.
+   //Register functions might be called in any order, so anything that depends on 
+   //  multiple types of entity will need to be checked in each relevant function.
    public void RegisterExit(Exit newExit) {
       exit = newExit;
 
@@ -47,6 +50,9 @@ public class GameManager : MonoBehaviour {
       }
    }
 
+   //When a new scene is loaded, all enemies register themselves with the game manager.
+   //Register functions might be called in any order, so anything that depends on 
+   //  multiple types of entity will need to be checked in each relevant function.
    public void RegisterEnemy(Enemy newEnemy) {
       enemies.Add (newEnemy);
 
@@ -69,6 +75,7 @@ public class GameManager : MonoBehaviour {
       SetupNewLevel ();
    }
 
+   //Brings up an appropriate UI popup, giving relevant button options to the player.
    public void LevelComplete() {
       canvas.SetActive (true);
 
@@ -108,6 +115,7 @@ public class GameManager : MonoBehaviour {
    }
 
    //For when the player dies.
+   //Brings up an appropriate UI popup, giving relevant button options to the player.
    public void GameOver() {
       canvas.SetActive (true);
       title.text = LOSE_TEXT;
@@ -128,6 +136,7 @@ public class GameManager : MonoBehaviour {
       yield return null;
    }
 
+   //Clear up all references to the previous level to prepare for the new one.
    private void SetupNewLevel() {
       enemies.Clear ();
       exit = null;
