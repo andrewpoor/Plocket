@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: 577fbf000fbb914408c7a76a55f7160a
-timeCreated: 1526733585
+timeCreated: 1527539708
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
@@ -11,6 +11,9 @@ TextureImporter:
     21300008: Plocket Level Spritesheet_4
     21300010: Plocket Level Spritesheet_5
     21300012: Plocket Level Spritesheet_6
+    21300014: Plocket Level Spritesheet_7
+    21300016: Plocket Level Spritesheet_8
+    21300018: Plocket Level Spritesheet_9
   serializedVersion: 4
   mipmaps:
     mipMapMode: 0
@@ -183,6 +186,45 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 64
+        y: 0
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Plocket Level Spritesheet_7
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 0
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Plocket Level Spritesheet_8
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 0
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Plocket Level Spritesheet_9
+      rect:
+        serializedVersion: 2
+        x: 256
         y: 0
         width: 64
         height: 64
