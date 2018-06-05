@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: f39a508f68644dd469697cb8251e1aae
-timeCreated: 1526592907
+timeCreated: 1528219793
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
@@ -49,6 +49,12 @@ TextureImporter:
     21300084: Plocket Spritesheet_42
     21300086: Plocket Spritesheet_43
     21300088: Plocket Spritesheet_44
+    21300090: Plocket Spritesheet_45
+    21300092: Plocket Spritesheet_46
+    21300094: Plocket Spritesheet_47
+    21300096: Plocket Spritesheet_48
+    21300098: Plocket Spritesheet_49
+    21300100: Plocket Spritesheet_50
   serializedVersion: 4
   mipmaps:
     mipMapMode: 0
@@ -143,7 +149,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 512
+        y: 640
         width: 64
         height: 64
       alignment: 0
@@ -156,7 +162,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 64
-        y: 512
+        y: 640
         width: 64
         height: 64
       alignment: 0
@@ -169,7 +175,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 128
-        y: 512
+        y: 640
         width: 64
         height: 64
       alignment: 0
@@ -182,7 +188,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 192
-        y: 512
+        y: 640
         width: 64
         height: 64
       alignment: 0
@@ -195,7 +201,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 256
-        y: 512
+        y: 640
         width: 64
         height: 64
       alignment: 0
@@ -208,7 +214,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 448
+        y: 576
         width: 64
         height: 64
       alignment: 0
@@ -221,7 +227,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 64
-        y: 448
+        y: 576
         width: 64
         height: 64
       alignment: 0
@@ -234,7 +240,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 128
-        y: 448
+        y: 576
         width: 64
         height: 64
       alignment: 0
@@ -247,7 +253,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 192
-        y: 448
+        y: 576
         width: 64
         height: 64
       alignment: 0
@@ -260,7 +266,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 256
-        y: 448
+        y: 576
         width: 64
         height: 64
       alignment: 0
@@ -273,7 +279,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 384
+        y: 512
         width: 64
         height: 64
       alignment: 0
@@ -286,7 +292,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 64
-        y: 384
+        y: 512
         width: 64
         height: 64
       alignment: 0
@@ -299,7 +305,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 128
-        y: 384
+        y: 512
         width: 64
         height: 64
       alignment: 0
@@ -312,7 +318,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 192
-        y: 384
+        y: 512
         width: 64
         height: 64
       alignment: 0
@@ -325,7 +331,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 256
-        y: 384
+        y: 512
         width: 64
         height: 64
       alignment: 0
@@ -338,7 +344,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 320
+        y: 448
         width: 64
         height: 64
       alignment: 0
@@ -351,7 +357,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 64
-        y: 320
+        y: 448
         width: 64
         height: 64
       alignment: 0
@@ -364,7 +370,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 128
-        y: 320
+        y: 448
         width: 64
         height: 64
       alignment: 0
@@ -377,7 +383,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 192
-        y: 320
+        y: 448
         width: 64
         height: 64
       alignment: 0
@@ -390,7 +396,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 256
-        y: 320
+        y: 448
         width: 64
         height: 64
       alignment: 0
@@ -403,7 +409,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 256
+        y: 384
         width: 64
         height: 64
       alignment: 0
@@ -416,7 +422,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 64
-        y: 256
+        y: 384
         width: 64
         height: 64
       alignment: 0
@@ -429,7 +435,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 128
-        y: 256
+        y: 384
         width: 64
         height: 64
       alignment: 0
@@ -442,7 +448,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 192
-        y: 256
+        y: 384
         width: 64
         height: 64
       alignment: 0
@@ -455,7 +461,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 256
-        y: 256
+        y: 384
         width: 64
         height: 64
       alignment: 0
@@ -468,7 +474,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 192
+        y: 320
         width: 64
         height: 64
       alignment: 0
@@ -481,7 +487,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 64
-        y: 192
+        y: 320
         width: 64
         height: 64
       alignment: 0
@@ -494,7 +500,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 128
-        y: 192
+        y: 320
         width: 64
         height: 64
       alignment: 0
@@ -507,7 +513,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 192
-        y: 192
+        y: 320
         width: 64
         height: 64
       alignment: 0
@@ -520,7 +526,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 256
-        y: 192
+        y: 320
         width: 64
         height: 64
       alignment: 0
@@ -533,7 +539,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 128
+        y: 256
         width: 64
         height: 64
       alignment: 0
@@ -546,7 +552,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 64
-        y: 128
+        y: 256
         width: 64
         height: 64
       alignment: 0
@@ -559,7 +565,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 128
-        y: 128
+        y: 256
         width: 64
         height: 64
       alignment: 0
@@ -572,7 +578,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 192
-        y: 128
+        y: 256
         width: 64
         height: 64
       alignment: 0
@@ -585,7 +591,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 256
-        y: 128
+        y: 256
         width: 64
         height: 64
       alignment: 0
@@ -598,7 +604,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 64
+        y: 192
         width: 64
         height: 64
       alignment: 0
@@ -611,7 +617,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 64
-        y: 64
+        y: 192
         width: 64
         height: 64
       alignment: 0
@@ -624,7 +630,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 128
-        y: 64
+        y: 192
         width: 64
         height: 64
       alignment: 0
@@ -637,7 +643,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 192
-        y: 64
+        y: 192
         width: 64
         height: 64
       alignment: 0
@@ -650,7 +656,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 256
-        y: 64
+        y: 192
         width: 64
         height: 64
       alignment: 0
@@ -663,7 +669,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 0
+        y: 128
         width: 64
         height: 64
       alignment: 0
@@ -676,7 +682,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 64
-        y: 0
+        y: 128
         width: 64
         height: 64
       alignment: 0
@@ -689,7 +695,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 128
-        y: 0
+        y: 128
         width: 64
         height: 64
       alignment: 0
@@ -702,7 +708,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 192
-        y: 0
+        y: 128
         width: 64
         height: 64
       alignment: 0
@@ -715,6 +721,84 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 256
+        y: 128
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Plocket Spritesheet_45
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 64
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Plocket Spritesheet_46
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 64
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Plocket Spritesheet_47
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 64
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Plocket Spritesheet_48
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 64
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Plocket Spritesheet_49
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 64
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Plocket Spritesheet_50
+      rect:
+        serializedVersion: 2
+        x: 0
         y: 0
         width: 64
         height: 64

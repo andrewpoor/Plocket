@@ -16,12 +16,18 @@ public class PlayerController : MonoBehaviour {
    public float pullToExitSpeed; //Speed at which the player is pulled to the exit upon touching it.
    public float shotRechargeDelay;
 
+   [HideInInspector] public float timePlayed { get; private set; } //Duration the plocket has been moving for.
+
    private bool playerReady = false; //Used to make the rocket only move when the player is ready.
    private bool lockMovement = false; //Used by the game to allow or disallow rocket movement regardless of player input.
-   private bool laserReady = false;
    private bool shotReady = false;
+   private bool timing = false; //Flag for whether time should be tracked at the moment.
    private float accelerationProgress = 0.0f; //Time in seconds since acceleration begun.
    private float speed = 0.0f; //Current speed.
+
+   #pragma warning disable 0414
+   private bool laserReady = false;
+   #pragma warning restore 0414
 
    private Animator animator;
    private PolygonCollider2D polygonCollider;
@@ -35,6 +41,7 @@ public class PlayerController : MonoBehaviour {
       laserCooldown = GameObject.Instantiate (laserCooldownPrefab, transform).GetComponent<LaserCooldown>();
       laserCooldown.playerControler = this;
       shotOffset = (GetComponent<Renderer> ().bounds.size.y / 2.0f) * Vector2.up;
+      GameManager.Instance.RegisterPlayer (this);
 
       StartCoroutine (WaitUntilPlayerReady ());
 	}
@@ -60,7 +67,11 @@ public class PlayerController : MonoBehaviour {
    }
 
    void LateUpdate() {
-      if(Input.GetButtonDown("Fire1") && shotReady && !lockMovement) {
+      if (timing) {
+         timePlayed += Time.deltaTime;
+      }
+
+      if(Input.GetButton("Fire1") && shotReady && !lockMovement) {
          ShootEnergyShot ();
       }
    }
@@ -73,6 +84,7 @@ public class PlayerController : MonoBehaviour {
       }
 
       playerReady = true;
+      StartTimer ();
       StartCoroutine (Accelerate ());
       yield return null;
    }
@@ -160,6 +172,7 @@ public class PlayerController : MonoBehaviour {
       laserReady = false;
       polygonCollider.enabled = false;
       laserCooldown.gameObject.SetActive(false);
+      timing = false;
       animator.SetTrigger ("Explode"); //Event trigger at end calls EndDestruction
    }
 
@@ -177,6 +190,7 @@ public class PlayerController : MonoBehaviour {
       laserReady = false;
       polygonCollider.enabled = false;
       laserCooldown.gameObject.SetActive(false);
+      timing = false;
       StartCoroutine (MoveToExit(exitTransform.position));
    }
 
@@ -198,5 +212,10 @@ public class PlayerController : MonoBehaviour {
 
       //Temp
       gameObject.SetActive(false);
+   }
+
+   private void StartTimer() {
+      timePlayed = 0.0f;
+      timing = true;
    }
 }
