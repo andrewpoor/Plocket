@@ -6,15 +6,19 @@ public class PlayerController : MonoBehaviour {
 
    public GameObject laserCooldownPrefab;
    public GameObject energyShotPrefab;
+   public AudioClip movingAudio;
+   public AudioClip explodingAudio;
+   public AudioClip warpingAudio;
 
    public float maxSpeed; //Speed of plocket once it has fully accelerated.
    public float accelerationTime; //Time in seconds to reach max speed from a standstill.
    public float rotationSpeed;
+   public float pullToExitSpeed; //Speed at which the player is pulled to the exit upon touching it.
+   public float shotRechargeDelay;
+   public float movingAudioVolume;
    public LayerMask blockingLayer;
    public int laserDamage;
    public int shotDamage;
-   public float pullToExitSpeed; //Speed at which the player is pulled to the exit upon touching it.
-   public float shotRechargeDelay;
 
    [HideInInspector] public float timePlayed { get; private set; } //Duration the plocket has been moving for.
 
@@ -31,6 +35,7 @@ public class PlayerController : MonoBehaviour {
 
    private Animator animator;
    private PolygonCollider2D polygonCollider;
+   private AudioSource audioSource;
    private LaserCooldown laserCooldown;
    private Vector2 shotOffset; //Energy shots should be fired from the front end of the rocket.
 
@@ -38,6 +43,7 @@ public class PlayerController : MonoBehaviour {
 	void Start () {
       animator = GetComponent<Animator> ();
       polygonCollider = GetComponent<PolygonCollider2D> ();
+      audioSource = GetComponent<AudioSource> ();
       laserCooldown = GameObject.Instantiate (laserCooldownPrefab, transform).GetComponent<LaserCooldown>();
       laserCooldown.playerControler = this;
       shotOffset = (GetComponent<Renderer> ().bounds.size.y / 2.0f) * Vector2.up;
@@ -85,6 +91,7 @@ public class PlayerController : MonoBehaviour {
 
       playerReady = true;
       StartTimer ();
+      PlayAudio (movingAudio, true, 0.0f);
       StartCoroutine (Accelerate ());
       yield return null;
    }
@@ -93,7 +100,9 @@ public class PlayerController : MonoBehaviour {
    private IEnumerator Accelerate() {
       while (speed < maxSpeed) {
          accelerationProgress += Time.deltaTime;
-         speed = Mathf.Lerp (0, maxSpeed, accelerationProgress / accelerationTime);
+         float t = accelerationProgress / accelerationTime;
+         speed = Mathf.Lerp (0.0f, maxSpeed, t);
+         audioSource.volume = Mathf.Lerp (0.0f, movingAudioVolume, t);
          yield return null;
       }
 
@@ -173,6 +182,7 @@ public class PlayerController : MonoBehaviour {
       polygonCollider.enabled = false;
       laserCooldown.gameObject.SetActive(false);
       timing = false;
+      PlayAudio (explodingAudio);
       animator.SetTrigger ("Explode"); //Event trigger at end calls EndDestruction
    }
 
@@ -183,6 +193,24 @@ public class PlayerController : MonoBehaviour {
       gameObject.SetActive (false);
    }
 
+//   private IEnumerator WaitUntilDestroyed() {
+//      while (!FinishedExplodeAnimation || !FinishedExplodeAudio) {
+//         yield return null;
+//      }
+//
+//      gameObject.SetActive (false);
+//   }
+//
+//   private void OnDestruction() {
+//      GameManager.Instance.EnemyDestroyed (this);
+//      GetComponent<Renderer> ().enabled = false;
+//      FinishedExplodeAnimation = true;
+//   }
+//
+//   private void OnExplodeAudioFinished() {
+//      FinishedExplodeAudio = true;
+//   }
+
    //Move the rocket to the exit sprite's centre, then begin the exiting animation, 
    //  before finally transitioning to the next level/screen as appropriate.
    private void BeginExitReached(Transform exitTransform) {
@@ -191,6 +219,7 @@ public class PlayerController : MonoBehaviour {
       polygonCollider.enabled = false;
       laserCooldown.gameObject.SetActive(false);
       timing = false;
+      PlayAudio (warpingAudio);
       StartCoroutine (MoveToExit(exitTransform.position));
    }
 
@@ -209,13 +238,18 @@ public class PlayerController : MonoBehaviour {
 
    private void EndExitReached() {
       GameManager.Instance.LevelComplete ();
-
-      //Temp
       gameObject.SetActive(false);
    }
 
    private void StartTimer() {
       timePlayed = 0.0f;
       timing = true;
+   }
+
+   private void PlayAudio(AudioClip clip, bool loop = false, float volume = 1.0f) {
+      audioSource.clip = clip;
+      audioSource.Play ();
+      audioSource.loop = loop;
+      audioSource.volume = volume;
    }
 }

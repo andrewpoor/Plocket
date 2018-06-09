@@ -24,6 +24,7 @@ GameObject:
   - component: {fileID: 50791558657215356}
   - component: {fileID: 114083530407492372}
   - component: {fileID: 95186163952590112}
+  - component: {fileID: 82004929840389730}
   m_Layer: 0
   m_Name: Plocket
   m_TagString: Untagged
@@ -96,6 +97,86 @@ PolygonCollider2D:
       - {x: 0, y: 0.33}
       - {x: -0.32, y: -0.15}
       - {x: -0.32, y: -0.22}
+--- !u!82 &82004929840389730
+AudioSource:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1509217429717186}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_PlayOnAwake: 0
+  m_Volume: 1
+  m_Pitch: 1.4
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 2
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    - serializedVersion: 2
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 2
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 0
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 2
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 2
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 0
 --- !u!95 &95186163952590112
 Animator:
   serializedVersion: 3
@@ -128,16 +209,20 @@ MonoBehaviour:
     type: 2}
   energyShotPrefab: {fileID: 1778168978503848, guid: 7fff78c024fb589478e6e59da1b59781,
     type: 2}
+  movingAudio: {fileID: 8300000, guid: 77ba63a0124fd479da19e0a4207bedf2, type: 3}
+  explodingAudio: {fileID: 8300000, guid: a5016a4da1b8c3f44908967039c7499b, type: 3}
+  warpingAudio: {fileID: 8300000, guid: 4c9af61653d53e14385c542252e0b44f, type: 3}
   maxSpeed: 3.5
-  accelerationTime: 1.5
+  accelerationTime: 1
   rotationSpeed: 180
+  pullToExitSpeed: 3
+  shotRechargeDelay: 0.3
+  movingAudioVolume: 0.2
   blockingLayer:
     serializedVersion: 2
     m_Bits: 256
   laserDamage: 10
   shotDamage: 3
-  pullToExitSpeed: 3
-  shotRechargeDelay: 0.3
 --- !u!212 &212349739422814508
 SpriteRenderer:
   m_ObjectHideFlags: 1

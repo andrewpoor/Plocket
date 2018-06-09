@@ -16,8 +16,10 @@ public class ImmobileEnemy : Enemy {
    }
 
    void FixedUpdate () {
-      //Float up and down slightly.
-      float newY = startingPosition.y + hoveringDisplacement * Mathf.Sin (Time.fixedTime * hoveringSpeed);
-      transform.position = new Vector2 (startingPosition.x, newY);
+      if (alive) {
+         //Float up and down slightly.
+         float newY = startingPosition.y + hoveringDisplacement * Mathf.Sin (Time.fixedTime * hoveringSpeed);
+         transform.position = new Vector2 (startingPosition.x, newY);
+      }
    }
 }

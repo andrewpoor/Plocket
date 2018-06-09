@@ -6,11 +6,13 @@ public class Exit : MonoBehaviour {
 
    private CircleCollider2D circleCollider;
    private Animator animator;
+   private AudioSource audioSource;
 
    // Use this for initialization
    void Start () {
       circleCollider = GetComponent<CircleCollider2D> ();
       animator = GetComponent<Animator> ();
+      audioSource = GetComponent<AudioSource> ();
       GameManager.Instance.RegisterExit (this);
    }
    
@@ -24,5 +26,6 @@ public class Exit : MonoBehaviour {
    public void Open() {
       animator.SetTrigger ("Open");
       circleCollider.enabled = true;
+      audioSource.Play ();
    }
 }
