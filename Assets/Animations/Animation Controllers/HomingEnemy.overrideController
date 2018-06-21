@@ -1,0 +1,16 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!221 &22100000
+AnimatorOverrideController:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: HomingEnemy
+  m_Controller: {fileID: 9100000, guid: d4cdd6f4c9f0ce947bc25f947c0a4984, type: 2}
+  m_Clips:
+  - m_OriginalClip: {fileID: 7400000, guid: d908874830a0a4e4784c1134c38b9c2d, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: 5e382b3fbf7fa144a9a3d296b3bf87a2, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: f5a714cb374cac64c8630324bf33dd9f, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: b3b79ea00b2dc064a8c1c5b54e451526, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: f8647da0e9061cf439ad3bff91b8c7b5, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: 5866f8d65ae87ab43b9904feea636571, type: 2}

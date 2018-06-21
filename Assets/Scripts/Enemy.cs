@@ -23,7 +23,7 @@ public abstract class Enemy : MonoBehaviour, IDamageable {
       health -= damage;
 
       if (health <= 0) {
-         GetComponent<PolygonCollider2D> ().enabled = false;
+         GetComponent<Collider2D> ().enabled = false;
          alive = false;
          audioSource.Play ();
          Invoke ("OnExplodeAudioFinished", audioSource.clip.length);
@@ -45,6 +45,7 @@ public abstract class Enemy : MonoBehaviour, IDamageable {
    private void OnDestruction() {
       GameManager.Instance.EnemyDestroyed (this);
       GetComponent<Renderer> ().enabled = false;
+      GetComponent<Animator>().enabled = false;
       FinishedExplodeAnimation = true;
    }
 

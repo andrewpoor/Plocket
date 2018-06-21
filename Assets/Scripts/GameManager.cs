@@ -26,23 +26,30 @@ public class GameManager : MonoBehaviour {
    public Text timeTaken;
 
    public Texture2D cursorTexture; //A crosshair cursor.
+   public AudioClip menuMusic;
+   public AudioClip levelMusic;
+   public PlayerController player { get; private set; }
 
    private Exit exit;
    private List<Enemy> enemies;
-   private PlayerController player;
+
+   private AudioSource audioSource;
 
    void Awake () {
       //Singleton.
       if (Instance == null) {
          Instance = this;
+
+         DontDestroyOnLoad (gameObject); //Persist over scenes.
+         canvas.SetActive (false);
+         enemies = new List<Enemy> ();
+         Cursor.SetCursor (cursorTexture, new Vector2 (cursorTexture.width / 2.0f, cursorTexture.height / 2.0f), CursorMode.Auto);
+         audioSource = GetComponent<AudioSource> ();
+         audioSource.clip = (SceneManager.GetActiveScene ().buildIndex == 0) ? menuMusic : levelMusic; //TODO: Temp
+         audioSource.Play ();
       } else if (Instance != this) {
          Destroy (gameObject);
       }
-
-      DontDestroyOnLoad (gameObject); //Persist over scenes.
-      canvas.SetActive (false);
-      enemies = new List<Enemy> ();
-      Cursor.SetCursor (cursorTexture, new Vector2 (cursorTexture.width / 2.0f, cursorTexture.height / 2.0f), CursorMode.Auto);
    }
 
    void Update() {
@@ -89,10 +96,12 @@ public class GameManager : MonoBehaviour {
       }
    }
 
-   //Loads the first level. Probably TEMP
+   //Loads the first level. Probably TEMP until proper menus in place.
    public void StartGame() {
       SceneManager.LoadScene (1);
       SetupNewLevel ();
+      audioSource.clip = levelMusic; //TODO: Temp
+      audioSource.Play ();
    }
 
    //Brings up an appropriate UI popup, giving relevant button options to the player.
