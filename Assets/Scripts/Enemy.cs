@@ -43,10 +43,13 @@ public abstract class Enemy : MonoBehaviour, IDamageable {
    }
 
    private void OnDestruction() {
-      GameManager.Instance.EnemyDestroyed (this);
       GetComponent<Renderer> ().enabled = false;
       GetComponent<Animator>().enabled = false;
       FinishedExplodeAnimation = true;
+
+      if(GameManager.Instance.player.alive) {
+         GameManager.Instance.EnemyDestroyed(this);
+      }
    }
 
    private void OnExplodeAudioFinished() {

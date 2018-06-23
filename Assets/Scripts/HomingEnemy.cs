@@ -13,4 +13,13 @@ public class HomingEnemy : Enemy {
          transform.Translate (direction.normalized * speed * Time.deltaTime);
       }
    }
+
+   void OnTriggerEnter2D(Collider2D other)
+   {
+      //Explode on contact with player
+      if (other.CompareTag("Player"))
+      {
+         DealDamage(health);
+      }
+   }
 }

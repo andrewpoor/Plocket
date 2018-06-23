@@ -20,6 +20,7 @@ public class PlayerController : MonoBehaviour {
    public int laserDamage;
    public int shotDamage;
 
+   [HideInInspector] public bool alive { get; private set; }
    [HideInInspector] public float timePlayed { get; private set; } //Duration the plocket has been moving for.
 
    private bool playerReady = false; //Used to make the rocket only move when the player is ready.
@@ -48,6 +49,7 @@ public class PlayerController : MonoBehaviour {
       laserCooldown.playerControler = this;
       shotOffset = (GetComponent<Renderer> ().bounds.size.y / 2.0f) * Vector2.up;
       GameManager.Instance.RegisterPlayer (this);
+      alive = true;
 
       StartCoroutine (WaitUntilPlayerReady ());
 	}
@@ -182,6 +184,7 @@ public class PlayerController : MonoBehaviour {
       polygonCollider.enabled = false;
       laserCooldown.gameObject.SetActive(false);
       timing = false;
+      alive = false;
       PlayAudio (explodingAudio);
       animator.SetTrigger ("Explode"); //Event trigger at end calls EndDestruction
    }

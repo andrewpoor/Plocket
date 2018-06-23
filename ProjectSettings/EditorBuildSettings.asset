@@ -44,4 +44,19 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Level11 - Mixing Matching.unity
     guid: 09e07d62d29fa1444bec9edf7019c4f6
+  - enabled: 1
+    path: Assets/Scenes/Level12 - A Homing Enemy.unity
+    guid: 940bbcb3a916fb94e9b9d81561d6a59d
+  - enabled: 1
+    path: Assets/Scenes/Level13 - Spiny Snake.unity
+    guid: 024d41d3819a65347a4b06fac911ced8
+  - enabled: 1
+    path: Assets/Scenes/Level14 - The Final S.unity
+    guid: 25261f8f2bb4ad143b122633b7542ca3
+  - enabled: 1
+    path: Assets/Scenes/Level15 - Minefield.unity
+    guid: 3fdc0c36c74202640b2e44b92d2a062b
+  - enabled: 1
+    path: Assets/Scenes/Level16 - Boss Battle!.unity
+    guid: d7a67ebd4d77b1b4abc955d9062f0167
   m_configObjects: {}
