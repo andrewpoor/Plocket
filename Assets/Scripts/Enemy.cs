@@ -7,9 +7,9 @@ public abstract class Enemy : MonoBehaviour, IDamageable {
    public int health;
 
    protected bool alive = true;
+   protected Animator animator;
+   protected AudioSource audioSource;
 
-   private Animator animator;
-   private AudioSource audioSource;
    private bool FinishedExplodeAnimation = false;
    private bool FinishedExplodeAudio = false;
 
@@ -31,7 +31,13 @@ public abstract class Enemy : MonoBehaviour, IDamageable {
          StartCoroutine(WaitUntilDestroyed());
       } else {
          animator.SetTrigger ("Damage");
+         ReactToDamage();
       }
+   }
+
+   //A hook for child classes to make use of if needed.
+   protected virtual void ReactToDamage() {
+      //Do nothing by default.
    }
 
    private IEnumerator WaitUntilDestroyed() {

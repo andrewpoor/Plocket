@@ -45,8 +45,7 @@ public class GameManager : MonoBehaviour {
          enemies = new List<Enemy> ();
          Cursor.SetCursor (cursorTexture, new Vector2 (cursorTexture.width / 2.0f, cursorTexture.height / 2.0f), CursorMode.Auto);
          audioSource = GetComponent<AudioSource> ();
-         audioSource.clip = (SceneManager.GetActiveScene ().buildIndex == 0) ? menuMusic : levelMusic; //TODO: Temp
-         audioSource.Play ();
+         SetBackgroundMusic((SceneManager.GetActiveScene ().buildIndex == 0) ? menuMusic : levelMusic); //TODO: Temp
       } else if (Instance != this) {
          Destroy (gameObject);
       }
@@ -96,12 +95,16 @@ public class GameManager : MonoBehaviour {
       }
    }
 
+   public void SetBackgroundMusic(AudioClip clip) {
+      audioSource.clip = clip;
+      audioSource.Play();
+   }
+
    //Loads the first level. Probably TEMP until proper menus in place.
    public void StartGame() {
       SceneManager.LoadScene (1);
       SetupNewLevel ();
-      audioSource.clip = levelMusic; //TODO: Temp
-      audioSource.Play ();
+      SetBackgroundMusic(levelMusic); //TODO: Temp
    }
 
    //Brings up an appropriate UI popup, giving relevant button options to the player.
