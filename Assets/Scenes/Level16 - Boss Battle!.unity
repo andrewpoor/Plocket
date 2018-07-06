@@ -258,10 +258,13 @@ MonoBehaviour:
   dormantTheme: {fileID: 8300000, guid: f8ef79f4ce2b908438735d073ecd499a, type: 3}
   wakingSound: {fileID: 8300000, guid: 3a5c2e83eef3141bbb7548e7fab85a90, type: 3}
   battleTheme: {fileID: 8300000, guid: 1fc75001643a7f2449dac31738a99d3d, type: 3}
-  shakeDuration: 2
   shakeDisplacement: 0.05
-  shakeOscillations: 16
-  startingPosition: 1
+  shakeDuration: 0.8
+  shakeOscillations: 8
+  firstShakeDuration: 2
+  firstShakeOscillations: 20
+  startingPositionIndex: 1
+  speed: 10
 --- !u!82 &410498959
 AudioSource:
   m_ObjectHideFlags: 0
@@ -521,6 +524,14 @@ Prefab:
     - target: {fileID: 4731814249614804, guid: ea37789fd04e3db44b76a7e827c64c29, type: 2}
       propertyPath: m_RootOrder
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1391357851088574, guid: ea37789fd04e3db44b76a7e827c64c29, type: 2}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1869776978330564, guid: ea37789fd04e3db44b76a7e827c64c29, type: 2}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: ea37789fd04e3db44b76a7e827c64c29, type: 2}

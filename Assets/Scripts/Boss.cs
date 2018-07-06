@@ -10,10 +10,13 @@ public class Boss : Enemy {
    public AudioClip wakingSound;
    public AudioClip battleTheme;
 
-   public float shakeDuration = 2.0f;
-   public float shakeDisplacement = 0.1f;
-   public int shakeOscillations = 4;
-   public int startingPositionIndex = 1; //See diagram below.
+   public float shakeDisplacement;
+   public float shakeDuration;
+   public int shakeOscillations;
+   public float firstShakeDuration;
+   public int firstShakeOscillations;
+   public int startingPositionIndex; //See diagram below.
+   public float speed;
 
    /* Transform positions for the boss's various states.
     * Positions are numbered as below:
@@ -53,7 +56,14 @@ public class Boss : Enemy {
    private void Update() {
       if(!inAction) {
          //do stuff
+
+         //TODO: TEMP
+         if (Input.GetButtonDown("Fire2")) {
+            Move();
+         } 
       }
+
+
    }
 
    protected override void ReactToDamage() {
@@ -75,9 +85,12 @@ public class Boss : Enemy {
    private IEnumerator StartMovement(bool firstMovement) {
       Vector2 origin = transform.position;
 
+      float duration = firstMovement ? firstShakeDuration : shakeDuration;
+      float oscillations = firstMovement ? firstShakeOscillations : shakeOscillations;
+
       //First shake to indicate movement phase is beginning.
-      for(float timer = 0.0f; timer < shakeDuration; timer += Time.deltaTime) {
-         float xDisplacement = Mathf.Sin((SINGLE_OSCILLATION * shakeOscillations) * (timer / shakeDuration)) * shakeDisplacement;
+      for(float timer = 0.0f; timer < duration; timer += Time.deltaTime) {
+         float xDisplacement = Mathf.Sin((SINGLE_OSCILLATION * oscillations) * (timer / duration)) * shakeDisplacement;
          transform.position = new Vector2(origin.x + xDisplacement, origin.y);
          yield return null;
       }
@@ -88,22 +101,42 @@ public class Boss : Enemy {
       }
 
       int newPositionIndex = ChooseNewPosition();
-      List<Vector2> route = new List<Vector2>();
+      int verticalToStart = SameX(currentPositionIndex);
+      int horizontalToStart = SameY(currentPositionIndex);
+      int diagonallyOppositeStart = DiagonallyOpposite(currentPositionIndex);
+      Queue<Vector2> route = new Queue<Vector2>();
 
       //Plan a route. Behaviour is different if starting or ending at the centre,
       // otherwise the boss moves in a Z pattern.
       if (newPositionIndex == 4) {
          //Route to centre.
+         route.Enqueue(positions[horizontalToStart]);
+         route.Enqueue(positions[diagonallyOppositeStart]);
       } else if (currentPositionIndex == 4) {
          //Route from centre.
+         route.Enqueue(positions[DiagonallyOpposite(newPositionIndex)]);
+         route.Enqueue(positions[SameX(newPositionIndex)]);
       } else {
          //Route from one corner to another, in a Z pattern.
-         if(SameX(currentPositionIndex, newPositionIndex)) {
-
-         } else if (SameY(currentPositionIndex, newPositionIndex)) {
-
+         if(verticalToStart == newPositionIndex) { //Vertically aligned
+            route.Enqueue(positions[horizontalToStart]);
+         } else if (horizontalToStart == newPositionIndex) { //Horizontally aligned
+            route.Enqueue(positions[diagonallyOppositeStart]);
          } else { //New position is in opposite corner.
+            route.Enqueue(positions[horizontalToStart]);
+            route.Enqueue(positions[verticalToStart]);
+         }
+      }
+      route.Enqueue(positions[newPositionIndex]);
 
+      while(route.Count > 0) {
+         Vector3 target = route.Dequeue();
+
+         //While the object is some distance away from the end point, move towards it
+         while ((transform.position - target).sqrMagnitude > float.Epsilon) {
+            Vector2 newPosition = Vector2.MoveTowards(transform.position, target, speed * Time.deltaTime);
+            transform.position = newPosition;
+            yield return null;
          }
       }
 
@@ -119,8 +152,10 @@ public class Boss : Enemy {
 
    //Returns a new position index, other than the current one.
    private int ChooseNewPosition() {
+      bool atCentre = currentPositionIndex == 4;
+
       //Get available boss positions, excluding the current location.
-      int[] availableBossPositions = new int[NUM_POSITIONS - 1];
+      int[] availableBossPositions = new int[NUM_POSITIONS - (atCentre ? 1 : 0)];
       int position = 0;
       for (int i = 0; i < availableBossPositions.Length; i++) {
          if (position == currentPositionIndex) {
@@ -129,10 +164,49 @@ public class Boss : Enemy {
          }
          availableBossPositions[i] = position;
          position++;
-      }      
+      }
+      
+      //Increase chances of moving to centre due to unequal weighting.
+      //(There are more options around edges so centre is less likely by default).
+      if(!atCentre) {
+         availableBossPositions[availableBossPositions.Length - 1] = 4;
+      }
 
       //Randomly pick a new position from the available ones.
       return availableBossPositions[Random.Range(0, availableBossPositions.Length)];
+   }
+
+   //Returns the position index that has the same x value as the input.
+   private int SameX(int positionIndex) {
+      switch(positionIndex) {
+         case 0: return 2;
+         case 1: return 3;
+         case 2: return 0;
+         case 3: return 1;
+         default: return -1;
+      }
+   }
+
+   //Returns the position index that has the same y value as the input.
+   private int SameY(int positionIndex) {
+      switch (positionIndex) {
+         case 0: return 1;
+         case 1: return 0;
+         case 2: return 3;
+         case 3: return 2;
+         default: return -1;
+      }
+   }
+
+   //Returns the position index that is diagonally opposite the input.
+   private int DiagonallyOpposite(int positionIndex) {
+      switch (positionIndex) {
+         case 0: return 3;
+         case 1: return 2;
+         case 2: return 1;
+         case 3: return 0;
+         default: return -1;
+      }
    }
 
    private void PlayClip(AudioClip clip) {
