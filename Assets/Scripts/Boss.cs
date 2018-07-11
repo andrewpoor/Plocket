@@ -6,6 +6,8 @@ public class Boss : Enemy {
 
    private const float SINGLE_OSCILLATION = 2.0f * Mathf.PI; //The degrees, in radians, of a full sinusoidal oscillation.
 
+   public Enemy homingEnemyPrefab;
+   public Rocket rocketPrefab;
    public AudioClip dormantTheme;
    public AudioClip wakingSound;
    public AudioClip battleTheme;
@@ -17,6 +19,8 @@ public class Boss : Enemy {
    public int firstShakeOscillations;
    public int startingPositionIndex; //See diagram below.
    public float speed;
+   public float timeBetweenActions;
+   public float timerVariance; //The time between actions is randomised by this amount after each action.
 
    /* Transform positions for the boss's various states.
     * Positions are numbered as below:
@@ -30,6 +34,8 @@ public class Boss : Enemy {
     */
    private const float BOSS_X = 5.76f;
    private const float BOSS_Y = 3.84f;
+   private const float SPAWNER_OFFSET_X = 0.63f;
+   private const float SPAWNER_OFFSET_Y = -0.09f;
    private const int NUM_POSITIONS = 5;
    private readonly Vector2 TOP_RIGHT = new Vector2(BOSS_X, BOSS_Y);
    private readonly Vector2 BOTTOM_RIGHT = new Vector2(BOSS_X, -BOSS_Y);
@@ -41,6 +47,7 @@ public class Boss : Enemy {
    private bool dormant = true; //The boss starts dormant until the player attacks it.
    private Vector2[] positions; //All possible boss positions.
    private int currentPositionIndex; //Index into the array of posible positions for the current position.
+   private float actionTimer = 0.0f; //Counts up towards the next action usage.
 
    protected override void Start () {
       GameManager.Instance.SetBackgroundMusic(dormantTheme);
@@ -49,46 +56,67 @@ public class Boss : Enemy {
       transform.position = positions[startingPositionIndex];
       currentPositionIndex = startingPositionIndex;
 
+      //TODO: TMP
+      //StartCoroutine(SummonDrones());
+
       base.Start();
 	}
 
    //When not performing an action, count down towards performing the next.
    private void Update() {
-      if(!inAction) {
-         //do stuff
+      if(!inAction && !dormant) {
+         actionTimer += Time.deltaTime;
 
-         //TODO: TEMP
-         if (Input.GetButtonDown("Fire2")) {
-            Move();
-         } 
+         if(actionTimer >= timeBetweenActions) {
+            actionTimer = 0;
+            timeBetweenActions = Random.Range(timeBetweenActions - timerVariance, timeBetweenActions + timerVariance);
+            StartCoroutine(PerformAction());
+         }
       }
-
-
    }
 
    protected override void ReactToDamage() {
-      //If dormant, become active and start the boss sequence, beginning with movement.
+      //If dormant, become active and start the boss sequence.
       if(dormant) {
          dormant = false;
          PlayClip(wakingSound);
          GameManager.Instance.SetBackgroundMusic(null);
-         Move(true);
+         StartCoroutine(PerformAction(true));
       }
    }
 
-   private void Move(bool firstMovement = false) {
+   //Randomly choose an action to perform.
+   //Actions are weighted to favour ones which haven't been chosen recently.
+   //If firstAction is true, the boss sequence is just beginning and a special movement action is chosen.
+   private IEnumerator PerformAction(bool firstAction = false) {
       inAction = true;
       animator.SetTrigger("Action");
-      StartCoroutine(StartMovement(firstMovement));
+
+      Debug.Log("Performing action.");
+
+      if(firstAction) {
+         yield return StartCoroutine(Move(true));
+      } else {
+         //TODO: Temp
+         yield return StartCoroutine(SummonDrones());
+      }
+
+      Debug.Log("Action ended.");
+
+      inAction = false;
+      animator.SetTrigger("Idle");
    }
 
-   private IEnumerator StartMovement(bool firstMovement) {
+   //The boss shakes to act as a warning, and then follows a path to a new position on the stage.
+   //Stage positions are chosen from a predeterminded pool of specific ones.
+   //Movement is partially deterministic - between two specific points, the route will always be the same.
+   //  However the destination itself is chosen at random.
+   private IEnumerator Move(bool firstMovement = false) {
       Vector2 origin = transform.position;
-
       float duration = firstMovement ? firstShakeDuration : shakeDuration;
       float oscillations = firstMovement ? firstShakeOscillations : shakeOscillations;
 
-      //First shake to indicate movement phase is beginning.
+      //Start by shaking to indicate movement phase is beginning.
       for(float timer = 0.0f; timer < duration; timer += Time.deltaTime) {
          float xDisplacement = Mathf.Sin((SINGLE_OSCILLATION * oscillations) * (timer / duration)) * shakeDisplacement;
          transform.position = new Vector2(origin.x + xDisplacement, origin.y);
@@ -141,13 +169,6 @@ public class Boss : Enemy {
       }
 
       currentPositionIndex = newPositionIndex;
-      EndAction();
-      yield return null;
-   }
-
-   private void EndAction() {
-      inAction = false;
-      animator.SetTrigger("Idle");
    }
 
    //Returns a new position index, other than the current one.
@@ -207,6 +228,24 @@ public class Boss : Enemy {
          case 3: return 0;
          default: return -1;
       }
+   }
+
+   private IEnumerator SummonDrones() {
+      Vector2 leftSpawner = transform.position + new Vector3(-SPAWNER_OFFSET_X, SPAWNER_OFFSET_Y);
+      Vector2 rightSpawner = transform.position + new Vector3(SPAWNER_OFFSET_X, SPAWNER_OFFSET_Y);
+      Enemy enemyLeft = Instantiate(homingEnemyPrefab, leftSpawner, Quaternion.identity);
+      Enemy enemyRight = Instantiate(homingEnemyPrefab, rightSpawner, Quaternion.identity);
+      enemyLeft.spawnIn = true;
+      enemyRight.spawnIn = true;
+
+      //Wait until the enemies have finished spawning.
+      while(!enemyLeft.alive || !enemyRight.alive) {
+         yield return null;
+      }
+   }
+
+   private IEnumerator LaunchRockets() {
+      yield return null;
    }
 
    private void PlayClip(AudioClip clip) {

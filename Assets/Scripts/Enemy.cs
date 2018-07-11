@@ -4,9 +4,12 @@ using UnityEngine;
 
 public abstract class Enemy : MonoBehaviour, IDamageable {
 
+   public AudioClip explodeAudio;
    public int health;
 
-   protected bool alive = true;
+   [HideInInspector] public bool alive = false;
+   [HideInInspector] public bool spawnIn = false;
+
    protected Animator animator;
    protected AudioSource audioSource;
 
@@ -17,14 +20,28 @@ public abstract class Enemy : MonoBehaviour, IDamageable {
       animator = GetComponent<Animator> ();
       audioSource = GetComponent<AudioSource> ();
       GameManager.Instance.RegisterEnemy (this);
+
+      if(spawnIn) {
+         alive = false;
+         GetComponent<Collider2D>().enabled = false;
+         animator.SetTrigger("Spawn"); //Event trigger at end calls EndSpawning
+      } else {
+         alive = true;
+      }
+   }
+
+   private void EndSpawning() {
+      alive = true;
+      GetComponent<Collider2D>().enabled = true;
    }
 
    public void DealDamage(int damage) {
       health -= damage;
 
       if (health <= 0) {
-         GetComponent<Collider2D> ().enabled = false;
          alive = false;
+         GetComponent<Collider2D>().enabled = false;
+         audioSource.clip = explodeAudio;
          audioSource.Play ();
          Invoke ("OnExplodeAudioFinished", audioSource.clip.length);
          animator.SetTrigger ("Explode"); //Event trigger at end calls OnDestruction

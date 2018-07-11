@@ -81,7 +81,7 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: d13f404913ac02f47a779ff6d3de6c75, type: 3}
+  m_audioClip: {fileID: 0}
   m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
@@ -196,7 +196,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 855f2c72d700a764993f9232b01b5b44, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  explodeAudio: {fileID: 8300000, guid: d13f404913ac02f47a779ff6d3de6c75, type: 3}
   health: 9
+  spawnIn: 0
   hoveringDisplacement: 0.04
   hoveringSpeed: 2
 --- !u!212 &212944636679828062
