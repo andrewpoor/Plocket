@@ -20,15 +20,8 @@ public class Rocket : MonoBehaviour {
       animator = GetComponent<Animator>();
       polygonCollider = GetComponent<PolygonCollider2D>();
       audioSource = GetComponent<AudioSource>();
-      //StartCoroutine(Launch());
+      StartCoroutine(Launch());
 	}
-
-   //TODO: TMP
-   private void Update() {
-      if(Input.GetButtonDown("Fire2")) {
-         StartCoroutine(Launch());
-      }
-   }
 
    //The rocket first projects out of the boss while spinning for a while.
    //It then angles towards the player and shoots straight at them.
@@ -57,10 +50,10 @@ public class Rocket : MonoBehaviour {
       float targetAngle = Mathf.Atan2(rocketToPlayer.y, rocketToPlayer.x) * Mathf.Rad2Deg - 90.0f;
       targetAngle = (targetAngle + SPIN_DEGREES) % SPIN_DEGREES;
       timer = 0;
-      totalTime = (Mathf.Abs(startingAngle - targetAngle) / SPIN_DEGREES) / spinSpeed;
+      totalTime = (normaliseAngle(targetAngle - startingAngle)  / SPIN_DEGREES) / spinSpeed;
       while (timer < totalTime) {
          timer += Time.deltaTime;
-         transform.rotation = Quaternion.Euler(0.0f, 0.0f, Mathf.LerpAngle(startingAngle, targetAngle, timer / totalTime));
+         transform.Rotate(new Vector3(0, 0, SPIN_DEGREES * spinSpeed * Time.deltaTime));
          yield return null;
       }
 
@@ -72,13 +65,17 @@ public class Rocket : MonoBehaviour {
       }
    }
 
+   private float normaliseAngle(float angle) {
+      return (angle + SPIN_DEGREES) % SPIN_DEGREES;
+   }
+
    void OnTriggerEnter2D(Collider2D other) {
       if (other.CompareTag("Player") || other.CompareTag("Obstacle")) {
          StartExplode();
       }
    }
 
-   //The shot has hit something, and so begins to dissipate.
+   //The rocket has hit something, and so begins to explode.
    private void StartExplode() {
       animator.SetTrigger("Explode"); //Event trigger at end calls EndExplode
       audioSource.Play();

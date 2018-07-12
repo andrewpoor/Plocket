@@ -7,6 +7,7 @@ TagManager:
   - Damageable
   - Obstacle
   - Exit
+  - EnemyAttack
   layers:
   - Default
   - TransparentFX

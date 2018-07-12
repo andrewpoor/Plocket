@@ -170,7 +170,7 @@ public class PlayerController : MonoBehaviour {
    }
 
    void OnTriggerEnter2D(Collider2D other) {
-      if (other.CompareTag ("Damageable") || other.CompareTag ("Obstacle")) {
+      if (other.CompareTag ("Damageable") || other.CompareTag ("Obstacle") || other.CompareTag("EnemyAttack")) {
          BeginDestruction ();
       } else if (other.CompareTag("Exit")) {
          BeginExitReached (other.transform);

@@ -17,6 +17,11 @@ public class Boss : Enemy {
    public int shakeOscillations;
    public float firstShakeDuration;
    public int firstShakeOscillations;
+
+   public float timeBetweenRockets;
+   public float rocketDisplacementX;
+   public float rocketDisplacementY;
+
    public int startingPositionIndex; //See diagram below.
    public float speed;
    public float timeBetweenActions;
@@ -92,16 +97,12 @@ public class Boss : Enemy {
       inAction = true;
       animator.SetTrigger("Action");
 
-      Debug.Log("Performing action.");
-
       if(firstAction) {
          yield return StartCoroutine(Move(true));
       } else {
          //TODO: Temp
-         yield return StartCoroutine(SummonDrones());
+         yield return StartCoroutine(LaunchRockets());
       }
-
-      Debug.Log("Action ended.");
 
       inAction = false;
       animator.SetTrigger("Idle");
@@ -245,7 +246,17 @@ public class Boss : Enemy {
    }
 
    private IEnumerator LaunchRockets() {
-      yield return null;
+      Rocket leftRocket = Instantiate(rocketPrefab, transform.position, Quaternion.identity);
+      leftRocket.initialDisplacement = new Vector2(-rocketDisplacementX, rocketDisplacementY);
+      yield return new WaitForSeconds(timeBetweenRockets);
+
+      Rocket middleRocket = Instantiate(rocketPrefab, transform.position, Quaternion.identity);
+      middleRocket.initialDisplacement = new Vector2(0.0f, rocketDisplacementY);
+      yield return new WaitForSeconds(timeBetweenRockets);
+
+      Rocket rightRocket = Instantiate(rocketPrefab, transform.position, Quaternion.identity);
+      rightRocket.initialDisplacement = new Vector2(rocketDisplacementX, rocketDisplacementY);
+      yield return new WaitForSeconds(timeBetweenRockets);
    }
 
    private void PlayClip(AudioClip clip) {
