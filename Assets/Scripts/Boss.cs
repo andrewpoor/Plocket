@@ -6,8 +6,9 @@ public class Boss : Enemy {
 
    private const float SINGLE_OSCILLATION = 2.0f * Mathf.PI; //The degrees, in radians, of a full sinusoidal oscillation.
 
-   public Enemy homingEnemyPrefab;
+   public Enemy summonedEnemyPrefab;
    public Rocket rocketPrefab;
+   public GameObject laserPrefab;
    public AudioClip dormantTheme;
    public AudioClip wakingSound;
    public AudioClip battleTheme;
@@ -21,6 +22,13 @@ public class Boss : Enemy {
    public float timeBetweenRockets;
    public float rocketDisplacementX;
    public float rocketDisplacementY;
+
+   public float laserTurnAngleCorner;
+   public float laserDurationCorner;
+   public float laserTurnAngleCentre;
+   public float laserDurationCentre;
+   public float laserCooldownDuration;
+   public float laserTurnBackDuration;
 
    public int startingPositionIndex; //See diagram below.
    public float speed;
@@ -61,11 +69,8 @@ public class Boss : Enemy {
       transform.position = positions[startingPositionIndex];
       currentPositionIndex = startingPositionIndex;
 
-      //TODO: TMP
-      //StartCoroutine(SummonDrones());
-
       base.Start();
-	}
+   }
 
    //When not performing an action, count down towards performing the next.
    private void Update() {
@@ -77,6 +82,11 @@ public class Boss : Enemy {
             timeBetweenActions = Random.Range(timeBetweenActions - timerVariance, timeBetweenActions + timerVariance);
             StartCoroutine(PerformAction());
          }
+      }
+
+      //TODO: TMP
+      if(Input.GetButtonDown("Fire2")) {
+         StartCoroutine(FireLaser());
       }
    }
 
@@ -231,11 +241,12 @@ public class Boss : Enemy {
       }
    }
 
+   //Summon enemies from the boss to send after the player.
    private IEnumerator SummonDrones() {
       Vector2 leftSpawner = transform.position + new Vector3(-SPAWNER_OFFSET_X, SPAWNER_OFFSET_Y);
       Vector2 rightSpawner = transform.position + new Vector3(SPAWNER_OFFSET_X, SPAWNER_OFFSET_Y);
-      Enemy enemyLeft = Instantiate(homingEnemyPrefab, leftSpawner, Quaternion.identity);
-      Enemy enemyRight = Instantiate(homingEnemyPrefab, rightSpawner, Quaternion.identity);
+      Enemy enemyLeft = Instantiate(summonedEnemyPrefab, leftSpawner, Quaternion.identity);
+      Enemy enemyRight = Instantiate(summonedEnemyPrefab, rightSpawner, Quaternion.identity);
       enemyLeft.spawnIn = true;
       enemyRight.spawnIn = true;
 
@@ -245,6 +256,8 @@ public class Boss : Enemy {
       }
    }
 
+   //Launch rockets at the player.
+   //Rockets eject out the top in sequence, spin in place for a short while, and then shoot directly at the player.
    private IEnumerator LaunchRockets() {
       Rocket leftRocket = Instantiate(rocketPrefab, transform.position, Quaternion.identity);
       leftRocket.initialDisplacement = new Vector2(-rocketDisplacementX, rocketDisplacementY);
@@ -257,6 +270,49 @@ public class Boss : Enemy {
       Rocket rightRocket = Instantiate(rocketPrefab, transform.position, Quaternion.identity);
       rightRocket.initialDisplacement = new Vector2(rocketDisplacementX, rocketDisplacementY);
       yield return new WaitForSeconds(timeBetweenRockets);
+   }
+
+   //Fire a continuous laser in a pattern dependant on boss location.
+   //The boss first charges up for a period, then fires the laser continually while turning to cover a certain amount of the screen.
+   //In the top corners the boss turns to sweep part of the screen. In the centre the boss spins all the way around.
+   private IEnumerator FireLaser() {
+      //Charge
+      animator.SetTrigger("Charge");
+      yield return null;
+      while (animator.GetCurrentAnimatorStateInfo(0).IsName("BossChargingLaser")) {
+         yield return null;
+      }
+
+      //Fire laser
+      GameObject laser = Instantiate(laserPrefab, transform);
+      laser.transform.position = new Vector2(transform.position.x, transform.position.y - laser.GetComponent<Renderer>().bounds.size.y / 2.0f);
+
+      //Set turning variables
+      float turnAngle;
+      float duration;
+      if(currentPositionIndex == 4) {
+         turnAngle = (Random.value > 0.5f) ? laserTurnAngleCentre : -laserTurnAngleCentre; //Spin clockwise or counterclockwise at random.
+         duration = laserDurationCentre;
+      } else {
+         turnAngle = (currentPositionIndex == 0) ? laserTurnAngleCorner : -laserTurnAngleCorner; //Spin according to which corner the boss is in.
+         duration = laserDurationCorner;
+      }
+
+      //Turn (while firing laser until end of turning)
+      for(float timer = 0.0f; timer < duration; timer += Time.deltaTime) {
+         transform.Rotate(0.0f, 0.0f, turnAngle * Time.deltaTime / duration);
+         yield return null;
+      }
+      Destroy(laser);
+      yield return new WaitForSeconds(laserCooldownDuration);
+
+      //Turn back if at the corners
+      if (currentPositionIndex != 4) {
+         for (float timer = 0.0f; timer < laserTurnBackDuration; timer += Time.deltaTime) {
+            transform.Rotate(0.0f, 0.0f, -turnAngle * Time.deltaTime / laserTurnBackDuration);
+            yield return null;
+         }
+      }
    }
 
    private void PlayClip(AudioClip clip) {

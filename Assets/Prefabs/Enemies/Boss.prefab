@@ -206,9 +206,10 @@ MonoBehaviour:
   health: 300
   alive: 0
   spawnIn: 0
-  homingEnemyPrefab: {fileID: 114643197290665330, guid: 7e9e5b8d22083be4c98cc24c72b2f042,
-    type: 2}
+  summonedEnemyPrefab: {fileID: 0}
   rocketPrefab: {fileID: 114288030847311842, guid: 18ef50e02c50bbf49b7234c8af447562,
+    type: 2}
+  laserPrefab: {fileID: 1463447609282322, guid: 22efb5a5cfb2f9a43b5b47ecf7e2bfde,
     type: 2}
   dormantTheme: {fileID: 8300000, guid: f8ef79f4ce2b908438735d073ecd499a, type: 3}
   wakingSound: {fileID: 8300000, guid: 3a5c2e83eef3141bbb7548e7fab85a90, type: 3}
@@ -221,6 +222,12 @@ MonoBehaviour:
   timeBetweenRockets: 0.5
   rocketDisplacementX: 0.3
   rocketDisplacementY: 0.7
+  laserTurnAngleCorner: 75
+  laserDurationCorner: 2
+  laserTurnAngleCentre: 360
+  laserDurationCentre: 6
+  laserCooldownDuration: 1
+  laserTurnBackDuration: 1
   startingPositionIndex: 1
   speed: 10
   timeBetweenActions: 4
