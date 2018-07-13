@@ -6,23 +6,32 @@ public class Boss : Enemy {
 
    private const float SINGLE_OSCILLATION = 2.0f * Mathf.PI; //The degrees, in radians, of a full sinusoidal oscillation.
 
+   [Header("References")]
    public Enemy summonedEnemyPrefab;
    public Rocket rocketPrefab;
    public GameObject laserPrefab;
    public AudioClip dormantTheme;
-   public AudioClip wakingSound;
    public AudioClip battleTheme;
+   public AudioClip wakingSound;
+   public AudioClip shaking;
+   public AudioClip summoningDrones;
+   public AudioClip chargingLaser;
+   public AudioClip firingLaser;
 
+   [Header("Movement")]
    public float shakeDisplacement;
    public float shakeDuration;
    public int shakeOscillations;
    public float firstShakeDuration;
    public int firstShakeOscillations;
+   public float speed;
 
+   [Header("Rockets")]
    public float timeBetweenRockets;
    public float rocketDisplacementX;
    public float rocketDisplacementY;
 
+   [Header("Laser")]
    public float laserTurnAngleCorner;
    public float laserDurationCorner;
    public float laserTurnAngleCentre;
@@ -30,8 +39,8 @@ public class Boss : Enemy {
    public float laserCooldownDuration;
    public float laserTurnBackDuration;
 
+   [Header("General")]
    public int startingPositionIndex; //See diagram below.
-   public float speed;
    public float timeBetweenActions;
    public float timerVariance; //The time between actions is randomised by this amount after each action.
 
@@ -84,17 +93,19 @@ public class Boss : Enemy {
          }
       }
 
-      //TODO: TMP
-      if(Input.GetButtonDown("Fire2")) {
-         StartCoroutine(FireLaser());
-      }
+      ////TODO: TMP
+      //if(Input.GetButtonDown("Fire2")) {
+      //   //StartCoroutine(FireLaser());
+      //   //StartCoroutine(SummonDrones());
+      //   //StartCoroutine(LaunchRockets());
+      //   //StartCoroutine(Move());
+      //}
    }
 
    protected override void ReactToDamage() {
       //If dormant, become active and start the boss sequence.
       if(dormant) {
          dormant = false;
-         PlayClip(wakingSound);
          GameManager.Instance.SetBackgroundMusic(null);
          StartCoroutine(PerformAction(true));
       }
@@ -128,7 +139,8 @@ public class Boss : Enemy {
       float oscillations = firstMovement ? firstShakeOscillations : shakeOscillations;
 
       //Start by shaking to indicate movement phase is beginning.
-      for(float timer = 0.0f; timer < duration; timer += Time.deltaTime) {
+      PlayClip(firstMovement ? wakingSound : shaking);
+      for (float timer = 0.0f; timer < duration; timer += Time.deltaTime) {
          float xDisplacement = Mathf.Sin((SINGLE_OSCILLATION * oscillations) * (timer / duration)) * shakeDisplacement;
          transform.position = new Vector2(origin.x + xDisplacement, origin.y);
          yield return null;
@@ -249,6 +261,7 @@ public class Boss : Enemy {
       Enemy enemyRight = Instantiate(summonedEnemyPrefab, rightSpawner, Quaternion.identity);
       enemyLeft.spawnIn = true;
       enemyRight.spawnIn = true;
+      PlayClip(summoningDrones);
 
       //Wait until the enemies have finished spawning.
       while(!enemyLeft.alive || !enemyRight.alive) {
@@ -276,42 +289,55 @@ public class Boss : Enemy {
    //The boss first charges up for a period, then fires the laser continually while turning to cover a certain amount of the screen.
    //In the top corners the boss turns to sweep part of the screen. In the centre the boss spins all the way around.
    private IEnumerator FireLaser() {
+      //Set turning variables
+      float turnAngle;
+      float period;
+      if (currentPositionIndex == 4) {
+         turnAngle = (Random.value > 0.5f) ? laserTurnAngleCentre : -laserTurnAngleCentre; //Spin clockwise or counterclockwise at random.
+         period = laserDurationCentre;
+      } else {
+         turnAngle = (currentPositionIndex == 0) ? laserTurnAngleCorner : -laserTurnAngleCorner; //Spin according to which corner the boss is in.
+         period = laserDurationCorner;
+      }
+
       //Charge
       animator.SetTrigger("Charge");
+      PlayClip(chargingLaser);
       yield return null;
       while (animator.GetCurrentAnimatorStateInfo(0).IsName("BossChargingLaser")) {
          yield return null;
       }
 
-      //Fire laser
+      //Fire laser while turning.
+      PlayClip(firingLaser);
       GameObject laser = Instantiate(laserPrefab, transform);
       laser.transform.position = new Vector2(transform.position.x, transform.position.y - laser.GetComponent<Renderer>().bounds.size.y / 2.0f);
+      yield return StartCoroutine(Turn(0.0f, turnAngle, period));
 
-      //Set turning variables
-      float turnAngle;
-      float duration;
-      if(currentPositionIndex == 4) {
-         turnAngle = (Random.value > 0.5f) ? laserTurnAngleCentre : -laserTurnAngleCentre; //Spin clockwise or counterclockwise at random.
-         duration = laserDurationCentre;
-      } else {
-         turnAngle = (currentPositionIndex == 0) ? laserTurnAngleCorner : -laserTurnAngleCorner; //Spin according to which corner the boss is in.
-         duration = laserDurationCorner;
-      }
-
-      //Turn (while firing laser until end of turning)
-      for(float timer = 0.0f; timer < duration; timer += Time.deltaTime) {
-         transform.Rotate(0.0f, 0.0f, turnAngle * Time.deltaTime / duration);
+      //Power down the laser, fading out the laser audio. Once faded restore normal audio source parameters.
+      Destroy(laser);
+      for(float timer = 0.0f; timer < laserCooldownDuration; timer += Time.deltaTime) {
+         audioSource.volume = Mathf.Lerp(1.0f, 0.0f, timer / laserCooldownDuration);
          yield return null;
       }
-      Destroy(laser);
-      yield return new WaitForSeconds(laserCooldownDuration);
+      PlayClip(null);
+      audioSource.volume = 1.0f;
 
       //Turn back if at the corners
       if (currentPositionIndex != 4) {
-         for (float timer = 0.0f; timer < laserTurnBackDuration; timer += Time.deltaTime) {
-            transform.Rotate(0.0f, 0.0f, -turnAngle * Time.deltaTime / laserTurnBackDuration);
-            yield return null;
-         }
+         yield return StartCoroutine(Turn(turnAngle, 0.0f, laserTurnBackDuration));
+      }
+   }
+
+   //Smoothly turns the boss between the two given angles, over period seconds.
+   //Does not attempt to loop around past 360 degrees, so angles provided should account for that.
+   //(This allows for complete freedom in the rotations used, e.g. can go from 0 to 360.)
+   private IEnumerator Turn(float startAngle, float endAngle, float period) {
+      float currentAngle = startAngle;
+      for (float timer = 0.0f; Mathf.Abs(currentAngle - endAngle) > float.Epsilon; timer += Time.deltaTime) {
+         currentAngle = Mathf.Lerp(startAngle, endAngle, timer / period);
+         transform.rotation = Quaternion.Euler(0.0f, 0.0f, currentAngle);
+         yield return null;
       }
    }
 

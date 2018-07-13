@@ -101,7 +101,7 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: d13f404913ac02f47a779ff6d3de6c75, type: 3}
+  m_audioClip: {fileID: 0}
   m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
@@ -216,6 +216,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eca74282cf672904c9f77040565085d1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  launchAudio: {fileID: 8300000, guid: 4be7fcbf107a33d418cfc84122c36a78, type: 3}
+  fireAudio: {fileID: 8300000, guid: e375af9f959d0d548b456012d9f55635, type: 3}
+  explodeAudio: {fileID: 8300000, guid: d13f404913ac02f47a779ff6d3de6c75, type: 3}
   launchingSpeed: 1
   firingSpeed: 14
   numberSpins: 2

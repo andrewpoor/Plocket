@@ -6,6 +6,10 @@ public class Rocket : MonoBehaviour {
 
    private const float SPIN_DEGREES = 360.0f;
 
+   public AudioClip launchAudio;
+   public AudioClip fireAudio;
+   public AudioClip explodeAudio;
+
    public float launchingSpeed; //Speed when initially coming out of the boss.
    public float firingSpeed; //Speed when firing towards the player.
    public float numberSpins; //Number of spins the rocket does before firing towards the player.
@@ -27,6 +31,7 @@ public class Rocket : MonoBehaviour {
    //It then angles towards the player and shoots straight at them.
    private IEnumerator Launch() {
       //Leave the launcher
+      PlayClip(launchAudio);
       Vector3 target = transform.position + (Vector3) initialDisplacement;
       while ((transform.position - target).sqrMagnitude > float.Epsilon) {
          Vector2 newPosition = Vector2.MoveTowards(transform.position, target, launchingSpeed * Time.deltaTime);
@@ -59,6 +64,7 @@ public class Rocket : MonoBehaviour {
 
       //Fire at the player
       animator.SetTrigger("Fire");
+      PlayClip(fireAudio);
       while(true) {
          transform.Translate(Vector2.up * firingSpeed * Time.deltaTime);
          yield return null;
@@ -78,12 +84,17 @@ public class Rocket : MonoBehaviour {
    //The rocket has hit something, and so begins to explode.
    private void StartExplode() {
       animator.SetTrigger("Explode"); //Event trigger at end calls EndExplode
-      audioSource.Play();
+      PlayClip(explodeAudio);
       firingSpeed = 0;
       polygonCollider.enabled = false;
    }
 
    private void EndExplode() {
       Destroy(gameObject);
+   }
+
+   private void PlayClip(AudioClip clip) {
+      audioSource.clip = clip;
+      audioSource.Play();
    }
 }

@@ -206,19 +206,25 @@ MonoBehaviour:
   health: 300
   alive: 0
   spawnIn: 0
-  summonedEnemyPrefab: {fileID: 0}
+  summonedEnemyPrefab: {fileID: 114643197290665330, guid: 7e9e5b8d22083be4c98cc24c72b2f042,
+    type: 2}
   rocketPrefab: {fileID: 114288030847311842, guid: 18ef50e02c50bbf49b7234c8af447562,
     type: 2}
   laserPrefab: {fileID: 1463447609282322, guid: 22efb5a5cfb2f9a43b5b47ecf7e2bfde,
     type: 2}
   dormantTheme: {fileID: 8300000, guid: f8ef79f4ce2b908438735d073ecd499a, type: 3}
-  wakingSound: {fileID: 8300000, guid: 3a5c2e83eef3141bbb7548e7fab85a90, type: 3}
   battleTheme: {fileID: 8300000, guid: 1fc75001643a7f2449dac31738a99d3d, type: 3}
+  wakingSound: {fileID: 8300000, guid: 3a5c2e83eef3141bbb7548e7fab85a90, type: 3}
+  summoningDrones: {fileID: 8300000, guid: 96be52394a58bfd4fb9f84ec9f5bae54, type: 3}
+  chargingLaser: {fileID: 8300000, guid: aaca2a609d4020a429d5dd0fec292308, type: 3}
+  firingLaser: {fileID: 8300000, guid: 204801ef8f40b344b988965a1f051780, type: 3}
+  shaking: {fileID: 8300000, guid: 7c7f54707b08eec46a5307b227a78bc2, type: 3}
   shakeDisplacement: 0.05
   shakeDuration: 0.8
   shakeOscillations: 8
   firstShakeDuration: 2
   firstShakeOscillations: 20
+  speed: 10
   timeBetweenRockets: 0.5
   rocketDisplacementX: 0.3
   rocketDisplacementY: 0.7
@@ -229,7 +235,6 @@ MonoBehaviour:
   laserCooldownDuration: 1
   laserTurnBackDuration: 1
   startingPositionIndex: 1
-  speed: 10
   timeBetweenActions: 4
   timerVariance: 1
 --- !u!212 &212036937941755590
