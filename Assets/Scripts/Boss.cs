@@ -6,6 +6,13 @@ public class Boss : Enemy {
 
    private const float SINGLE_OSCILLATION = 2.0f * Mathf.PI; //The degrees, in radians, of a full sinusoidal oscillation.
 
+   private enum Action {
+      Move,
+      Drones,
+      Rockets,
+      Laser
+   };
+
    [Header("References")]
    public Enemy summonedEnemyPrefab;
    public Rocket rocketPrefab;
@@ -70,6 +77,7 @@ public class Boss : Enemy {
    private Vector2[] positions; //All possible boss positions.
    private int currentPositionIndex; //Index into the array of posible positions for the current position.
    private float actionTimer = 0.0f; //Counts up towards the next action usage.
+   private int[] actionWeights; //Weighting for randomly selecting actions. Index corresponds to action enum value.
 
    protected override void Start () {
       GameManager.Instance.SetBackgroundMusic(dormantTheme);
@@ -77,6 +85,11 @@ public class Boss : Enemy {
       positions = new Vector2[NUM_POSITIONS] {TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT, CENTRE };
       transform.position = positions[startingPositionIndex];
       currentPositionIndex = startingPositionIndex;
+
+      actionWeights = new int[System.Enum.GetNames(typeof(Action)).Length];
+      for(int i = 0; i < actionWeights.Length; ++i) {
+         actionWeights[i] = 1;
+      }
 
       base.Start();
    }
@@ -93,13 +106,14 @@ public class Boss : Enemy {
          }
       }
 
-      ////TODO: TMP
-      //if(Input.GetButtonDown("Fire2")) {
-      //   //StartCoroutine(FireLaser());
-      //   //StartCoroutine(SummonDrones());
-      //   //StartCoroutine(LaunchRockets());
-      //   //StartCoroutine(Move());
-      //}
+      //TODO: TMP
+      if (Input.GetButtonDown("Fire2")) {
+         //StartCoroutine(FireLaser());
+         //StartCoroutine(SummonDrones());
+         //StartCoroutine(LaunchRockets());
+         //StartCoroutine(Move());
+         //SelectAction();
+      }
    }
 
    protected override void ReactToDamage() {
@@ -117,16 +131,74 @@ public class Boss : Enemy {
    private IEnumerator PerformAction(bool firstAction = false) {
       inAction = true;
       animator.SetTrigger("Action");
+      yield return null;
 
       if(firstAction) {
          yield return StartCoroutine(Move(true));
       } else {
-         //TODO: Temp
-         yield return StartCoroutine(LaunchRockets());
+         yield return StartCoroutine(SelectAction());
       }
+      yield return null;
 
       inAction = false;
       animator.SetTrigger("Idle");
+   }
+
+   //Randomly select an action for the boss to do.
+   //Actions are weighted such that actions which haven't been chosen recently are more likely to be chosen.
+   private IEnumerator SelectAction() {
+      int[] cumulativeWeights = new int[actionWeights.Length];
+      for (int i = 0; i < cumulativeWeights.Length; ++i) {
+         cumulativeWeights[i] = (i == 0) ? actionWeights[i] : actionWeights[i] + cumulativeWeights[i - 1];
+      }
+
+      int randomIndex = Random.Range(1, cumulativeWeights[cumulativeWeights.Length - 1] + 1);
+      for (int i = 0; i < cumulativeWeights.Length; ++i) {
+         if(randomIndex <= cumulativeWeights[i]) {
+            Action actualAction = ConvertAction((Action)i);
+            UpdateActionWeights(actualAction);
+            return ConvertActionMethod(actualAction);
+         }
+      }
+
+      //Cannot get here.
+      Debug.Log("Got to inaccessible part of SelectAction - random index did not match any weight.");
+      return null;
+   }
+
+   //When in the corners, certain actions aren't used and are instead replaced by a Move action.
+   //This function does the appropriate replacement.
+   private Action ConvertAction(Action originalAction) {
+      //If in either top corner, can't use rockets.
+      if((currentPositionIndex == 0 || currentPositionIndex == 1) && originalAction == Action.Rockets) {
+         return Action.Move;
+      }
+
+      //If in either bottom corner, can't use the laser.
+      if ((currentPositionIndex == 2 || currentPositionIndex == 3) && originalAction == Action.Laser) {
+         return Action.Move;
+      }
+
+      //Otherwise can use whatever was originally selected.
+      return originalAction;
+   }
+
+   //Resets the weight for the chosen action, and increments the weights for every action that wasn't chosen.
+   private void UpdateActionWeights(Action selectedAction) {
+      for(int i = 0; i < actionWeights.Length; ++i) {
+         actionWeights[i] = (i == (int)selectedAction) ? 1 : actionWeights[i] + 1;
+      }
+   }
+
+   //Convert from action enum to action method.
+   private IEnumerator ConvertActionMethod(Action action) {
+      switch(action) {
+         case Action.Move: return Move();
+         case Action.Drones: return SummonDrones();
+         case Action.Rockets: return LaunchRockets();
+         case Action.Laser: return FireLaser();
+         default: return null;
+      }
    }
 
    //The boss shakes to act as a warning, and then follows a path to a new position on the stage.
@@ -283,6 +355,9 @@ public class Boss : Enemy {
       Rocket rightRocket = Instantiate(rocketPrefab, transform.position, Quaternion.identity);
       rightRocket.initialDisplacement = new Vector2(rocketDisplacementX, rocketDisplacementY);
       yield return new WaitForSeconds(timeBetweenRockets);
+
+      //Pause to allow rockets to spin in place and fire off for a short while.
+      yield return new WaitForSeconds(rocketPrefab.numberSpins / rocketPrefab.spinSpeed);
    }
 
    //Fire a continuous laser in a pattern dependant on boss location.
