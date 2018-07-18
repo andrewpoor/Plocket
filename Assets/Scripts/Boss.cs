@@ -105,15 +105,6 @@ public class Boss : Enemy {
             StartCoroutine(PerformAction());
          }
       }
-
-      //TODO: TMP
-      if (Input.GetButtonDown("Fire2")) {
-         //StartCoroutine(FireLaser());
-         //StartCoroutine(SummonDrones());
-         //StartCoroutine(LaunchRockets());
-         //StartCoroutine(Move());
-         //SelectAction();
-      }
    }
 
    protected override void ReactToDamage() {

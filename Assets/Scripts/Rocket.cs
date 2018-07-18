@@ -30,7 +30,7 @@ public class Rocket : MonoBehaviour {
    //The rocket first projects out of the boss while spinning for a while.
    //It then angles towards the player and shoots straight at them.
    private IEnumerator Launch() {
-      //Leave the launcher
+      //Leave the launcher while spinning
       PlayClip(launchAudio);
       Vector3 target = transform.position + (Vector3) initialDisplacement;
       while ((transform.position - target).sqrMagnitude > float.Epsilon) {
@@ -41,26 +41,17 @@ public class Rocket : MonoBehaviour {
       }
 
       //Spin in place a few times
-      float timer = 0;
+      float startingAngle = transform.rotation.eulerAngles.z;
+      float targetAngle = startingAngle + numberSpins * SPIN_DEGREES;
       float totalTime = numberSpins / spinSpeed;
-      while(timer < totalTime) {
-         timer += Time.deltaTime;
-         transform.Rotate(new Vector3(0, 0, SPIN_DEGREES * spinSpeed * Time.deltaTime));
-         yield return null;
-      }
+      yield return StartCoroutine(Turn(startingAngle, targetAngle, totalTime));
 
       //Spin to face the player
+      startingAngle = transform.rotation.eulerAngles.z;
       Vector3 rocketToPlayer = GameManager.Instance.player.transform.position - transform.position;
-      float startingAngle = transform.rotation.eulerAngles.z;
-      float targetAngle = Mathf.Atan2(rocketToPlayer.y, rocketToPlayer.x) * Mathf.Rad2Deg - 90.0f;
-      targetAngle = (targetAngle + SPIN_DEGREES) % SPIN_DEGREES;
-      timer = 0;
-      totalTime = (normaliseAngle(targetAngle - startingAngle)  / SPIN_DEGREES) / spinSpeed;
-      while (timer < totalTime) {
-         timer += Time.deltaTime;
-         transform.Rotate(new Vector3(0, 0, SPIN_DEGREES * spinSpeed * Time.deltaTime));
-         yield return null;
-      }
+      targetAngle = NormaliseAngle(Mathf.Atan2(rocketToPlayer.y, rocketToPlayer.x) * Mathf.Rad2Deg - 90.0f); //-90 accounts for sprite forward being off 90 degrees.
+      totalTime = (Mathf.Abs(startingAngle - targetAngle) / SPIN_DEGREES) / spinSpeed;
+      yield return StartCoroutine(Turn(startingAngle, targetAngle, totalTime));
 
       //Fire at the player
       animator.SetTrigger("Fire");
@@ -71,8 +62,20 @@ public class Rocket : MonoBehaviour {
       }
    }
 
-   private float normaliseAngle(float angle) {
+   private float NormaliseAngle(float angle) {
       return (angle + SPIN_DEGREES) % SPIN_DEGREES;
+   }
+
+   //Smoothly turns the boss between the two given angles, over period seconds.
+   //Does not attempt to loop around past 360 degrees, so angles provided should account for that.
+   //(This allows for complete freedom in the rotations used, e.g. can go from 0 to 360.)
+   private IEnumerator Turn(float startAngle, float endAngle, float period) {
+      float currentAngle = startAngle;
+      for (float timer = 0.0f; Mathf.Abs(currentAngle - endAngle) > float.Epsilon; timer += Time.deltaTime) {
+         currentAngle = Mathf.Lerp(startAngle, endAngle, timer / period);
+         transform.rotation = Quaternion.Euler(0.0f, 0.0f, currentAngle);
+         yield return null;
+      }
    }
 
    void OnTriggerEnter2D(Collider2D other) {
