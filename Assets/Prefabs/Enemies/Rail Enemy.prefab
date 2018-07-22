@@ -21,6 +21,7 @@ GameObject:
   - component: {fileID: 4520165464931950}
   - component: {fileID: 212117556840364438}
   - component: {fileID: 95383557147721520}
+  - component: {fileID: 114792746900269138}
   - component: {fileID: 114144264785276582}
   - component: {fileID: 60435350996838200}
   - component: {fileID: 50530707463006152}
@@ -221,11 +222,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fac9f8ba871d15546a3cdbeaaa25612f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  explodeAudio: {fileID: 8300000, guid: d13f404913ac02f47a779ff6d3de6c75, type: 3}
-  health: 6
-  spawnIn: 0
   speed: 3
   direction: {x: 0, y: 0}
+--- !u!114 &114792746900269138
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1190554222777244}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 79cca1f9ac0f2fb488daa073a2febe79, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  explodeAudio: {fileID: 8300000, guid: d13f404913ac02f47a779ff6d3de6c75, type: 3}
+  health: 6
+  alive: 0
+  spawnIn: 0
 --- !u!212 &212117556840364438
 SpriteRenderer:
   m_ObjectHideFlags: 1
@@ -259,7 +272,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -1985842423
-  m_SortingLayer: 3
+  m_SortingLayer: 4
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300032, guid: f39a508f68644dd469697cb8251e1aae, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}

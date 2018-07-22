@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class Enemy : MonoBehaviour, IDamageable {
+//Generic enemy behaviour.
+//Kept separate from more specific behaviour so that it can be disabled separately.
+public class Enemy : MonoBehaviour, IDamageable {
 
    public AudioClip explodeAudio;
    public int health;
@@ -10,15 +12,16 @@ public abstract class Enemy : MonoBehaviour, IDamageable {
    [HideInInspector] public bool alive = false;
    [HideInInspector] public bool spawnIn = false;
 
-   protected Animator animator;
-   protected AudioSource audioSource;
-
+   private Animator animator;
+   private AudioSource audioSource;
+   private EnemyType enemyTypeBehaviour; //Reference to own specific enemy type script.
    private bool FinishedExplodeAnimation = false;
    private bool FinishedExplodeAudio = false;
 
-   protected virtual void Start () {
+   private void Start () {
       animator = GetComponent<Animator> ();
       audioSource = GetComponent<AudioSource> ();
+      enemyTypeBehaviour = GetComponent<EnemyType>();
       GameManager.Instance.RegisterEnemy (this);
 
       if(spawnIn) {
@@ -37,24 +40,26 @@ public abstract class Enemy : MonoBehaviour, IDamageable {
 
    public void DealDamage(int damage) {
       health -= damage;
+      enemyTypeBehaviour.ReactToDamage();
 
       if (health <= 0) {
-         alive = false;
-         GetComponent<Collider2D>().enabled = false;
-         audioSource.clip = explodeAudio;
-         audioSource.Play ();
-         Invoke ("OnExplodeAudioFinished", audioSource.clip.length);
-         animator.SetTrigger ("Explode"); //Event trigger at end calls OnDestruction
-         StartCoroutine(WaitUntilDestroyed());
+         Explode();
       } else {
          animator.SetTrigger ("Damage");
-         ReactToDamage();
       }
    }
 
-   //A hook for child classes to make use of if needed.
-   protected virtual void ReactToDamage() {
-      //Do nothing by default.
+   //Starts the enemie's destruction sequence.
+   //Disables certain behaviours, plays appropriate visuals and sounds.
+   public void Explode() {
+      alive = false;
+      GetComponent<Collider2D>().enabled = false;
+      enemyTypeBehaviour.enabled = false;
+      audioSource.clip = explodeAudio;
+      audioSource.Play();
+      Invoke("OnExplodeAudioFinished", audioSource.clip.length);
+      animator.SetTrigger("Explode"); //Event trigger at end calls OnDestruction
+      StartCoroutine(WaitUntilDestroyed());
    }
 
    private IEnumerator WaitUntilDestroyed() {

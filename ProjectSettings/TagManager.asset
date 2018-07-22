@@ -48,6 +48,9 @@ TagManager:
   - name: Background
     uniqueID: 3010184809
     locked: 0
+  - name: Attacks
+    uniqueID: 729787839
+    locked: 0
   - name: Walls
     uniqueID: 3372990317
     locked: 0

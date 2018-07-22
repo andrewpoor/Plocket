@@ -1,8 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
-public class Boss : Enemy {
+public class Boss : EnemyType {
 
    private const float SINGLE_OSCILLATION = 2.0f * Mathf.PI; //The degrees, in radians, of a full sinusoidal oscillation.
 
@@ -20,10 +21,12 @@ public class Boss : Enemy {
    public AudioClip dormantTheme;
    public AudioClip battleTheme;
    public AudioClip wakingSound;
+   public AudioClip defeatedSound;
    public AudioClip shaking;
    public AudioClip summoningDrones;
    public AudioClip chargingLaser;
    public AudioClip firingLaser;
+   public Image healthBarMeter;
 
    [Header("Movement")]
    public float shakeDisplacement;
@@ -78,9 +81,14 @@ public class Boss : Enemy {
    private int currentPositionIndex; //Index into the array of posible positions for the current position.
    private float actionTimer = 0.0f; //Counts up towards the next action usage.
    private int[] actionWeights; //Weighting for randomly selecting actions. Index corresponds to action enum value.
+   private float maxHealth;
+   private Vector3 healthBarMax; //Size of health bar when full.
 
    protected override void Start () {
+      base.Start();
+
       GameManager.Instance.SetBackgroundMusic(dormantTheme);
+      enemyBehaviour.explodeAudio = defeatedSound;
 
       positions = new Vector2[NUM_POSITIONS] {TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT, CENTRE };
       transform.position = positions[startingPositionIndex];
@@ -91,7 +99,8 @@ public class Boss : Enemy {
          actionWeights[i] = 1;
       }
 
-      base.Start();
+      maxHealth = enemyBehaviour.health;
+      healthBarMax = healthBarMeter.rectTransform.localScale;
    }
 
    //When not performing an action, count down towards performing the next.
@@ -107,13 +116,20 @@ public class Boss : Enemy {
       }
    }
 
-   protected override void ReactToDamage() {
+   public override void ReactToDamage() {
       //If dormant, become active and start the boss sequence.
       if(dormant) {
          dormant = false;
          GameManager.Instance.SetBackgroundMusic(null);
          StartCoroutine(PerformAction(true));
       }
+
+      //Set health bar visual.
+      if(enemyBehaviour.health <= 0) {
+         healthBarMeter.enabled = false;
+      } else {
+         healthBarMeter.rectTransform.localScale = new Vector3(healthBarMax.x * (enemyBehaviour.health / maxHealth), healthBarMax.y, healthBarMax.z);
+      }      
    }
 
    //Randomly choose an action to perform.
@@ -143,18 +159,18 @@ public class Boss : Enemy {
          cumulativeWeights[i] = (i == 0) ? actionWeights[i] : actionWeights[i] + cumulativeWeights[i - 1];
       }
 
+      IEnumerator action = null;
       int randomIndex = Random.Range(1, cumulativeWeights[cumulativeWeights.Length - 1] + 1);
       for (int i = 0; i < cumulativeWeights.Length; ++i) {
          if(randomIndex <= cumulativeWeights[i]) {
             Action actualAction = ConvertAction((Action)i);
             UpdateActionWeights(actualAction);
-            return ConvertActionMethod(actualAction);
+            action = ConvertActionMethod(actualAction);
+            break;
          }
       }
 
-      //Cannot get here.
-      Debug.Log("Got to inaccessible part of SelectAction - random index did not match any weight.");
-      return null;
+      return action;
    }
 
    //When in the corners, certain actions aren't used and are instead replaced by a Move action.

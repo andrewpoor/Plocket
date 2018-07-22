@@ -2,15 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RailEnemy : Enemy {
+public class RailEnemy : EnemyType {
 
    public float speed;
    public Vector2 direction;
 
    void FixedUpdate () {
-      if (alive) {
-         transform.Translate (direction.normalized * speed * Time.deltaTime);
-      }
+      transform.Translate (direction.normalized * speed * Time.deltaTime);
    }
 
    void OnTriggerEnter2D(Collider2D other) {

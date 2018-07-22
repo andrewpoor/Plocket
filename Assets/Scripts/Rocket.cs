@@ -56,7 +56,7 @@ public class Rocket : MonoBehaviour {
       //Fire at the player
       animator.SetTrigger("Fire");
       PlayClip(fireAudio);
-      while(true) {
+      while (true) {
          transform.Translate(Vector2.up * firingSpeed * Time.deltaTime);
          yield return null;
       }

@@ -21,6 +21,7 @@ GameObject:
   - component: {fileID: 4521934105698894}
   - component: {fileID: 212036937941755590}
   - component: {fileID: 95152864397553988}
+  - component: {fileID: 114706573750193228}
   - component: {fileID: 114531179827538824}
   - component: {fileID: 60629497799913782}
   - component: {fileID: 82906425915687178}
@@ -202,12 +203,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9807ead541b89434381ab3bbd22fdae9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  explodeAudio: {fileID: 8300000, guid: d13f404913ac02f47a779ff6d3de6c75, type: 3}
-  health: 300
-  alive: 0
-  spawnIn: 0
-  summonedEnemyPrefab: {fileID: 114643197290665330, guid: 7e9e5b8d22083be4c98cc24c72b2f042,
-    type: 2}
+  summonedEnemyPrefab: {fileID: 0}
   rocketPrefab: {fileID: 114288030847311842, guid: 18ef50e02c50bbf49b7234c8af447562,
     type: 2}
   laserPrefab: {fileID: 1463447609282322, guid: 22efb5a5cfb2f9a43b5b47ecf7e2bfde,
@@ -215,10 +211,12 @@ MonoBehaviour:
   dormantTheme: {fileID: 8300000, guid: f8ef79f4ce2b908438735d073ecd499a, type: 3}
   battleTheme: {fileID: 8300000, guid: 1fc75001643a7f2449dac31738a99d3d, type: 3}
   wakingSound: {fileID: 8300000, guid: 3a5c2e83eef3141bbb7548e7fab85a90, type: 3}
+  defeatedSound: {fileID: 8300000, guid: b3d5ad0e7c9ed6f46bba42827b033eb3, type: 3}
+  shaking: {fileID: 8300000, guid: 7c7f54707b08eec46a5307b227a78bc2, type: 3}
   summoningDrones: {fileID: 8300000, guid: 96be52394a58bfd4fb9f84ec9f5bae54, type: 3}
   chargingLaser: {fileID: 8300000, guid: aaca2a609d4020a429d5dd0fec292308, type: 3}
   firingLaser: {fileID: 8300000, guid: 204801ef8f40b344b988965a1f051780, type: 3}
-  shaking: {fileID: 8300000, guid: 7c7f54707b08eec46a5307b227a78bc2, type: 3}
+  healthBarMeter: {fileID: 0}
   shakeDisplacement: 0.05
   shakeDuration: 0.8
   shakeOscillations: 8
@@ -229,14 +227,29 @@ MonoBehaviour:
   rocketDisplacementX: 0.3
   rocketDisplacementY: 0.7
   laserTurnAngleCorner: 75
-  laserDurationCorner: 2
+  laserDurationCorner: 3
   laserTurnAngleCentre: 360
-  laserDurationCentre: 6
+  laserDurationCentre: 8
   laserCooldownDuration: 1
   laserTurnBackDuration: 1
   startingPositionIndex: 1
   timeBetweenActions: 4
   timerVariance: 1
+--- !u!114 &114706573750193228
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1504747522704430}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 79cca1f9ac0f2fb488daa073a2febe79, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  explodeAudio: {fileID: 8300000, guid: d13f404913ac02f47a779ff6d3de6c75, type: 3}
+  health: 50
+  alive: 0
+  spawnIn: 0
 --- !u!212 &212036937941755590
 SpriteRenderer:
   m_ObjectHideFlags: 1
@@ -270,7 +283,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -1985842423
-  m_SortingLayer: 3
+  m_SortingLayer: 4
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300004, guid: c2ae90030e9d9144fbacfba8f09db543, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
