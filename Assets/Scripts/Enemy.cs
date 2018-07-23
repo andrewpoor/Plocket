@@ -8,6 +8,7 @@ public class Enemy : MonoBehaviour, IDamageable {
 
    public AudioClip explodeAudio;
    public int health;
+   public bool registerWithManager; //If true, the enemy's existence keeps the exit locked until destroyed.
 
    [HideInInspector] public bool alive = false;
    [HideInInspector] public bool spawnIn = false;
@@ -22,11 +23,15 @@ public class Enemy : MonoBehaviour, IDamageable {
       animator = GetComponent<Animator> ();
       audioSource = GetComponent<AudioSource> ();
       enemyTypeBehaviour = GetComponent<EnemyType>();
-      GameManager.Instance.RegisterEnemy (this);
+
+      if(registerWithManager) {
+         GameManager.Instance.RegisterEnemy(this);
+      }      
 
       if(spawnIn) {
          alive = false;
          GetComponent<Collider2D>().enabled = false;
+         enemyTypeBehaviour.enabled = false;
          animator.SetTrigger("Spawn"); //Event trigger at end calls EndSpawning
       } else {
          alive = true;
@@ -36,6 +41,7 @@ public class Enemy : MonoBehaviour, IDamageable {
    private void EndSpawning() {
       alive = true;
       GetComponent<Collider2D>().enabled = true;
+      enemyTypeBehaviour.enabled = true;
    }
 
    public void DealDamage(int damage) {
@@ -67,7 +73,10 @@ public class Enemy : MonoBehaviour, IDamageable {
          yield return null;
       }
 
-      gameObject.SetActive (false);
+      //Allow for specific behaviour first.
+      enemyTypeBehaviour.ReactToExplode();
+
+      Destroy(gameObject);
    }
 
    private void OnDestruction() {
@@ -75,7 +84,7 @@ public class Enemy : MonoBehaviour, IDamageable {
       GetComponent<Animator>().enabled = false;
       FinishedExplodeAnimation = true;
 
-      if(GameManager.Instance.player.alive) {
+      if(GameManager.Instance.player.alive && registerWithManager) {
          GameManager.Instance.EnemyDestroyed(this);
       }
    }

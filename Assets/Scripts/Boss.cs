@@ -94,6 +94,7 @@ public class Boss : EnemyType {
       transform.position = positions[startingPositionIndex];
       currentPositionIndex = startingPositionIndex;
 
+      //At first all actions have equal weights, thus equal chances of being chosen.
       actionWeights = new int[System.Enum.GetNames(typeof(Action)).Length];
       for(int i = 0; i < actionWeights.Length; ++i) {
          actionWeights[i] = 1;
@@ -108,6 +109,7 @@ public class Boss : EnemyType {
       if(!inAction && !dormant) {
          actionTimer += Time.deltaTime;
 
+         //If it's time, randomise the next action interval and perform an action.
          if(actionTimer >= timeBetweenActions) {
             actionTimer = 0;
             timeBetweenActions = Random.Range(timeBetweenActions - timerVariance, timeBetweenActions + timerVariance);
@@ -130,6 +132,12 @@ public class Boss : EnemyType {
       } else {
          healthBarMeter.rectTransform.localScale = new Vector3(healthBarMax.x * (enemyBehaviour.health / maxHealth), healthBarMax.y, healthBarMax.z);
       }      
+   }
+
+   //Once the destruction sequence has finished, the player has won and the level ends.
+   //(There is no need to move to the exit as in a normal level.)
+   public override void ReactToExplode() {
+      GameManager.Instance.LevelComplete();
    }
 
    //Randomly choose an action to perform.

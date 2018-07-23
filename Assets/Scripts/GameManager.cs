@@ -110,6 +110,7 @@ public class GameManager : MonoBehaviour {
    //Brings up an appropriate UI popup, giving relevant button options to the player.
    public void LevelComplete() {
       canvas.SetActive (true);
+      player.enabled = false;
 
       //Check if there's a level after this one.
       //If there is, load it on player command. Otherwise the game is complete.

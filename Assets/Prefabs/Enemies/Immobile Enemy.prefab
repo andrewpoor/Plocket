@@ -212,6 +212,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   explodeAudio: {fileID: 8300000, guid: d13f404913ac02f47a779ff6d3de6c75, type: 3}
   health: 9
+  lockExit: 1
   alive: 0
   spawnIn: 0
 --- !u!212 &212944636679828062

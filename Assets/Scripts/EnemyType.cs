@@ -15,7 +15,17 @@ public abstract class EnemyType : MonoBehaviour {
       audioSource = GetComponent<AudioSource>();
    }
 
+   //Hook for enemy types to respond whenever damage is taken.
    public virtual void ReactToDamage() {
       //Do nothing by default.
+   }
+
+   //Hook for enemy types to do something after exploding, before the game object is destroyed.
+   public virtual void ReactToExplode() {
+      //Do nothing by default.
+   }
+
+   private void OnDisable() {
+      StopAllCoroutines();
    }
 }

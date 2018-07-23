@@ -203,7 +203,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9807ead541b89434381ab3bbd22fdae9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  summonedEnemyPrefab: {fileID: 0}
+  summonedEnemyPrefab: {fileID: 114822120839983894, guid: 7e9e5b8d22083be4c98cc24c72b2f042,
+    type: 2}
   rocketPrefab: {fileID: 114288030847311842, guid: 18ef50e02c50bbf49b7234c8af447562,
     type: 2}
   laserPrefab: {fileID: 1463447609282322, guid: 22efb5a5cfb2f9a43b5b47ecf7e2bfde,
@@ -247,7 +248,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   explodeAudio: {fileID: 8300000, guid: d13f404913ac02f47a779ff6d3de6c75, type: 3}
-  health: 50
+  health: 300
+  registerWithManager: 0
   alive: 0
   spawnIn: 0
 --- !u!212 &212036937941755590
