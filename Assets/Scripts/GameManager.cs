@@ -1,10 +1,15 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour {
+
+   public const string UNKNOWN_LEVEL_TITLE = "???";
 
    private const string WIN_TEXT = "Level Complete!";
    private const string WIN_SUBTITLE = "Click to Continue";
@@ -29,26 +34,32 @@ public class GameManager : MonoBehaviour {
    public AudioClip menuMusic;
    public AudioClip levelMusic;
    public PlayerController player { get; private set; }
+   public int firstLevelSceneNumber = 1;
 
    private Exit exit;
    private List<Enemy> enemies;
 
    private AudioSource audioSource;
+   private SaveData saveData;
+   private string saveDataPath;
 
    void Awake () {
       //Singleton.
       if (Instance == null) {
          Instance = this;
-
          DontDestroyOnLoad (gameObject); //Persist over scenes.
-         canvas.SetActive (false);
-         enemies = new List<Enemy> ();
-         Cursor.SetCursor (cursorTexture, new Vector2 (cursorTexture.width / 2.0f, cursorTexture.height / 2.0f), CursorMode.Auto);
-         audioSource = GetComponent<AudioSource> ();
-         SetBackgroundMusic((SceneManager.GetActiveScene ().buildIndex == 0) ? menuMusic : levelMusic); //TODO: Temp
       } else if (Instance != this) {
          Destroy (gameObject);
       }
+
+      canvas.SetActive(false);
+      enemies = new List<Enemy>();
+      Cursor.SetCursor(cursorTexture, new Vector2(cursorTexture.width / 2.0f, cursorTexture.height / 2.0f), CursorMode.Auto);
+      audioSource = GetComponent<AudioSource>();
+      SetBackgroundMusic((SceneManager.GetActiveScene().buildIndex == 0) ? menuMusic : levelMusic); //TODO: Temp
+      saveDataPath = Application.persistentDataPath + "/saveData.dat";
+
+      LoadGame();
    }
 
    void Update() {
@@ -102,15 +113,16 @@ public class GameManager : MonoBehaviour {
 
    //Loads the first level. Probably TEMP until proper menus in place.
    public void StartGame() {
-      SceneManager.LoadScene (1);
+      SceneManager.LoadScene (firstLevelSceneNumber);
       SetupNewLevel ();
       SetBackgroundMusic(levelMusic); //TODO: Temp
    }
 
-   //Brings up an appropriate UI popup, giving relevant button options to the player.
+   //Saves the game and displays the relevant level completion popup for the user.
    public void LevelComplete() {
       canvas.SetActive (true);
       player.enabled = false;
+      SaveLevelRecord();
 
       //Check if there's a level after this one.
       //If there is, load it on player command. Otherwise the game is complete.
@@ -205,5 +217,66 @@ public class GameManager : MonoBehaviour {
       }
 
       return zeroes + timeRaw;
+   }
+
+   //Save information about the currently completed level.
+   //Relies on the game still being in the scene of the level to be saved.
+   private void SaveLevelRecord() {
+      int sceneNumber = SceneManager.GetActiveScene().buildIndex;
+      LevelData levelData = new LevelData(sceneNumber, player.timePlayed, SceneManager.GetActiveScene().name);
+
+      int index = sceneNumber - firstLevelSceneNumber;
+      if(index < saveData.levelDatas.Count) {
+         saveData.levelDatas[SceneManager.GetActiveScene().buildIndex - firstLevelSceneNumber] = levelData;
+      } else {
+         saveData.levelDatas.Insert(index, levelData);
+      }
+
+      SaveGame();
+   }
+
+   //Saves recorded data to a file. Does not add to recorded data however.
+   //To be called after all desired data has been recorded.
+   private void SaveGame() {
+      BinaryFormatter formatter = new BinaryFormatter();
+      FileStream file = File.Create(saveDataPath);
+      formatter.Serialize(file, saveData);
+      file.Close();
+   }
+
+   private void LoadGame() {
+      if(File.Exists(saveDataPath)) {
+         BinaryFormatter formatter = new BinaryFormatter();
+         FileStream file = File.Open(saveDataPath, FileMode.Open);
+         saveData = (SaveData)formatter.Deserialize(file);
+         file.Close();
+      } else {
+         saveData = new SaveData();
+      }
+   }
+}
+
+//Data to be saved to a file.
+[Serializable]
+class SaveData {
+   public List<LevelData> levelDatas;
+
+   public SaveData() {
+      levelDatas = new List<LevelData>();
+   }
+}
+
+//Data about an individual level that can be saved to a file.
+//If data for the level isn't present, that level has yet to be completed.
+[Serializable]
+class LevelData {
+   public int sceneNumber = 0; //Unity scene number for this level.
+   public float completionTimeRaw = float.PositiveInfinity; //Fastest time the user has taken to complete the level.
+   public string sceneName = GameManager.UNKNOWN_LEVEL_TITLE;
+
+   public LevelData(int sceneNumber, float completionTimeRaw, string sceneName) {
+      this.sceneNumber = sceneNumber;
+      this.completionTimeRaw = completionTimeRaw;
+      this.sceneName = sceneName;
    }
 }

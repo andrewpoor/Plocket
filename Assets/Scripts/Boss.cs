@@ -344,10 +344,15 @@ public class Boss : EnemyType {
    private IEnumerator SummonDrones() {
       Vector2 leftSpawner = transform.position + new Vector3(-SPAWNER_OFFSET_X, SPAWNER_OFFSET_Y);
       Vector2 rightSpawner = transform.position + new Vector3(SPAWNER_OFFSET_X, SPAWNER_OFFSET_Y);
+
       Enemy enemyLeft = Instantiate(summonedEnemyPrefab, leftSpawner, Quaternion.identity);
-      Enemy enemyRight = Instantiate(summonedEnemyPrefab, rightSpawner, Quaternion.identity);
       enemyLeft.spawnIn = true;
+      enemyLeft.registerWithManager = false;
+
+      Enemy enemyRight = Instantiate(summonedEnemyPrefab, rightSpawner, Quaternion.identity);
       enemyRight.spawnIn = true;
+      enemyRight.registerWithManager = false;
+
       PlayClip(summoningDrones);
 
       //Wait until the enemies have finished spawning.
