@@ -6,10 +6,14 @@ using UnityEngine.UI;
 public class MainMenu : MonoBehaviour {
 
    [SerializeField] private Button continueButton;
+   [SerializeField] private Button levelSelectButton;
 
    void Start () {
       if(!GameManager.Instance.ContinueExists) {
          MenuManager.SetButtonActive(continueButton, false); //Deactivate the continue button.
+      }
+      if (GameManager.Instance.LevelDatas.Count == 0) {
+         MenuManager.SetButtonActive(levelSelectButton, false); //Deactivate the level select button.
       }
    }
 

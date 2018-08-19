@@ -231,6 +231,7 @@ MonoBehaviour:
   thumbnail: {fileID: 114180507578828100}
   levelTitle: {fileID: 114437072240661260}
   completionTime: {fileID: 114261140539136976}
+  levelSelectButton: {fileID: 114490315628805460}
 --- !u!114 &114437072240661260
 MonoBehaviour:
   m_ObjectHideFlags: 1

@@ -26,6 +26,8 @@ public class GameManager : MonoBehaviour {
    private const string TIME_TAKEN_DISPLAY = "Time taken: ";
    private const string TIME_TAKEN_DISPLAY_LAST = "Time taken for this level: ";
    private const string TIME_TAKEN_HIDE = "";
+   private const string BEST_TIME_DISPLAY = "Best time: ";
+   private const string PREVIOUS_BEST_TIME_DISPLAY = "Previous: ";
 
    //Singleton
    public static GameManager Instance { get; private set; }
@@ -45,6 +47,9 @@ public class GameManager : MonoBehaviour {
    [SerializeField] private Text title;
    [SerializeField] private Text subtitle;
    [SerializeField] private Text timeTaken;
+   [SerializeField] private Text bestTime;
+   [SerializeField] private Text newBestTimeLabel; //Shows when the player's time is a new record for that level.
+   [SerializeField] private Text previousBestTime; //Shows when the player's time is a new record for that level.
 
    [SerializeField] private Texture2D cursorTexture; //A crosshair cursor.
    [SerializeField] private AudioClip menuMusic;
@@ -60,6 +65,8 @@ public class GameManager : MonoBehaviour {
    private string saveDataPath;
    private bool inPlaythrough; //True if starting a new game or continuing one, false if loading a level by itself.
 
+   private int CurrentSceneNumber { get { return SceneManager.GetActiveScene().buildIndex; } }
+
    void Awake () {
       //Singleton.
       if (Instance == null) {
@@ -74,7 +81,7 @@ public class GameManager : MonoBehaviour {
       enemies = new List<Enemy>();
       Cursor.SetCursor(cursorTexture, new Vector2(cursorTexture.width / 2.0f, cursorTexture.height / 2.0f), CursorMode.Auto);
       audioSource = GetComponent<AudioSource>();
-      SetBackgroundMusic(ChooseBackgroundMusic(SceneManager.GetActiveScene().buildIndex));
+      SetBackgroundMusic(ChooseBackgroundMusic(CurrentSceneNumber));
       saveDataPath = Application.persistentDataPath + "/saveData.dat";
       MenuLocation = MenuType.MainMenu;
 
@@ -156,17 +163,27 @@ public class GameManager : MonoBehaviour {
    public void LevelComplete() {
       canvas.SetActive (true);
       Player.enabled = false;
-      RecordLevelData();
+      string timeTaken = TimeTakenForLevel(Player.TimePlayed);
+      string previousBestTime = timeTaken;
 
-      if(inPlaythrough) {
+      //Check if a record time already existed in the save data.
+      int index = CurrentSceneNumber - firstLevelSceneNumber;
+      if (index < saveData.levelDatas.Count) {
+         previousBestTime = TimeTakenForLevel(saveData.levelDatas[index].completionTimeRaw);
+      }
+
+      //Record the data for the current level, and check if this is a new best time for the level.
+      bool newTimeRecord = RecordLevelData();
+
+      if (inPlaythrough) {
          //Check if there's a level after this one.
          //If there is, load it on player command. Otherwise the game is complete.
-         if (SceneManager.GetActiveScene().buildIndex + 1 < SceneManager.sceneCountInBuildSettings) {
+         if (CurrentSceneNumber + 1 < SceneManager.sceneCountInBuildSettings) {
             saveData.continueGame = true;
-            saveData.currentSceneNumber = SceneManager.GetActiveScene().buildIndex + 1; //If the player were to stop here, they'd resume at the start of the next level.
+            saveData.currentSceneNumber = CurrentSceneNumber + 1; //If the player were to stop here, they'd resume at the start of the next level.
             SaveGame();
 
-            EditLevelEndPopup(WIN_TEXT, WIN_SUBTITLE, TIME_TAKEN_DISPLAY + TimeTakenForLevel(Player.TimePlayed));
+            EditLevelEndPopup(WIN_TEXT, WIN_SUBTITLE, timeTaken, previousBestTime, newTimeRecord);
 
             StartCoroutine(WaitUntilLevelChange());
          } else {
@@ -174,13 +191,13 @@ public class GameManager : MonoBehaviour {
             saveData.currentSceneNumber = firstLevelSceneNumber;
             SaveGame();
 
-            EditLevelEndPopup(GAME_COMPLETE_TEXT, GAME_COMPLETE_SUBTITLE, TIME_TAKEN_DISPLAY + TimeTakenForLevel(Player.TimePlayed));
+            EditLevelEndPopup(GAME_COMPLETE_TEXT, GAME_COMPLETE_SUBTITLE, timeTaken, previousBestTime, newTimeRecord);
 
             StartCoroutine(WaitUntilReturnToMainMenu());
          }
       } else {
          SaveGame();
-         EditLevelEndPopup(WIN_TEXT, WIN_SUBTITLE, TIME_TAKEN_DISPLAY + TimeTakenForLevel(Player.TimePlayed));
+         EditLevelEndPopup(WIN_TEXT, WIN_SUBTITLE, timeTaken, previousBestTime, newTimeRecord);
          StartCoroutine(WaitUntilReturnToMainMenu());
       }  
    }
@@ -207,9 +224,8 @@ public class GameManager : MonoBehaviour {
    //Brings up an appropriate UI popup, giving relevant button options to the player.
    public void GameOver() {
       canvas.SetActive(true);
-      title.text = LOSE_TEXT;
-      subtitle.text = LOSE_SUBTITLE;
-      timeTaken.text = TIME_TAKEN_HIDE;
+
+      //TODO: Enable gameover popup here and disable others.
 
       StartCoroutine(WaitUntilRestart());
    }
@@ -223,10 +239,17 @@ public class GameManager : MonoBehaviour {
    }
 
    //Setup the various texts on the popup that shows up when a level is completed. 
-   private void EditLevelEndPopup(string title, string subtitle, string timeTaken) {
+   private void DisplayLevelEndPopup(string title, string subtitle, string timeTaken, string previousBestTime, bool newRecord) {
+      //TODO: Enable level end popup here and disable others.
+
       this.title.text = title;
       this.subtitle.text = subtitle;
-      this.timeTaken.text = timeTaken;
+      this.timeTaken.text = TIME_TAKEN_DISPLAY + timeTaken;
+      this.bestTime.text = BEST_TIME_DISPLAY + (newRecord ? timeTaken : previousBestTime);
+      this.previousBestTime.text = "(" + PREVIOUS_BEST_TIME_DISPLAY + previousBestTime + ")";
+
+      this.newBestTimeLabel.enabled = newRecord;
+      this.previousBestTime.enabled = newRecord;
    }
 
    //Wait for the player to signal that it's time to continue and then advance to the next level.
@@ -256,7 +279,7 @@ public class GameManager : MonoBehaviour {
          yield return null;
       }
 
-      SceneManager.LoadScene (SceneManager.GetActiveScene ().buildIndex);
+      SceneManager.LoadScene (CurrentSceneNumber);
       canvas.SetActive (false);
       SetupNewLevel ();
       yield return null;
@@ -299,16 +322,23 @@ public class GameManager : MonoBehaviour {
 
    //Record information about the currently completed level, such as completion time.
    //Relies on the game still being in the scene of the level to be saved.
-   private void RecordLevelData() {
-      int sceneNumber = SceneManager.GetActiveScene().buildIndex;
-      LevelData levelData = new LevelData(sceneNumber, Player.TimePlayed, SceneManager.GetActiveScene().name);
-      int index = sceneNumber - firstLevelSceneNumber;
+   //Returns true if the time taken is a new record for this save data, false otherwise.
+   private bool RecordLevelData() {
+      LevelData levelData = new LevelData(CurrentSceneNumber, Player.TimePlayed, SceneManager.GetActiveScene().name);
+      int index = CurrentSceneNumber - firstLevelSceneNumber;
 
-      if(index < saveData.levelDatas.Count) {
-         saveData.levelDatas[SceneManager.GetActiveScene().buildIndex - firstLevelSceneNumber] = levelData;
+      //Check if data for this level alredy exists. If it does, overwrite if the new completion time is faster than the currently stored one.
+      if (index < saveData.levelDatas.Count) {
+         float currentBestTime = saveData.levelDatas[index].completionTimeRaw;
+         if(levelData.completionTimeRaw < currentBestTime) {
+            saveData.levelDatas[index] = levelData;
+            return true;
+         }
       } else {
          saveData.levelDatas.Insert(index, levelData);
       }
+
+      return false;
    }
 
    //Saves recorded data to a file. Does not add to recorded data however.

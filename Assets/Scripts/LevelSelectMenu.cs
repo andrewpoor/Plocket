@@ -5,16 +5,19 @@ using UnityEngine.UI;
 
 public class LevelSelectMenu : MonoBehaviour {
 
+   //References to all of the level thumbnails, in level order.
+   //thumbnails[0] corresponds to the placeholder level image, for levels not yet completed.
    public Sprite[] thumbnails;
 
    [SerializeField] private LevelSelectTile tilePrefab;
 
+   //Buttons for turning to the previous or next page of level tiles.
    [SerializeField] private Button leftButton;
    [SerializeField] private Button rightButton;
 
    private int numPages;
-   private int currentPageNumber;
-   private List<LevelSelectPage> pages;
+   private int currentPageNumber; //Indexed from 0, so goes up to (numPages - 1)
+   private List<LevelSelectPage> pages; //Pages of level tiles that can be switched between.
    private LevelSelectPage currentPage;
 
    void Start () {
@@ -25,24 +28,39 @@ public class LevelSelectMenu : MonoBehaviour {
       List<LevelData> levelDatas = GameManager.Instance.LevelDatas;
       for(int i = 0; i < levelDatas.Count; ++i) {
          LevelSelectTile tile = Instantiate(tilePrefab, transform);
-         tile.SetTileVariables(levelDatas[i], thumbnails[levelDatas[i].sceneNumber]);
+
+         if(levelDatas[i].completionTimeRaw > float.Epsilon) {
+            tile.SetTileVariables(levelDatas[i], thumbnails[levelDatas[i].sceneNumber]);
+         } else {
+            tile.SetAsNonCompletedLevel(thumbnails[0]);
+         }         
 
          //Try to add the tile to the current page. If it is full, create a new one.
          if(!currentPage.TryAddTile(tile)) {
+            currentPage.SetInteractive(false);
             CreateNewPage();
             currentPage.TryAddTile(tile);
          }
       }
 
+      //Fill out empty tiles to represent levels yet to complete if the current page still has space.
+      int numEmptyTiles = LevelSelectPage.TILES_PER_PAGE - currentPage.TileCount;
+      for (int i = 0; i < numEmptyTiles; ++i) {
+         LevelSelectTile tile = Instantiate(tilePrefab, transform);
+         tile.SetAsNonCompletedLevel(thumbnails[0]);
+         currentPage.TryAddTile(tile);
+      }
+
+      numPages = pages.Count;
       GoToPage(0);
    }
 
    public void GoToPage(int pageNumber) {
-      currentPage.SetActive(false);
+      currentPage.SetInteractive(false);
 
       currentPageNumber = pageNumber;
       currentPage = pages[pageNumber];
-      currentPage.SetActive(true);
+      currentPage.SetInteractive(true);
 
       SetButtonActivity();
    }
@@ -65,14 +83,13 @@ public class LevelSelectMenu : MonoBehaviour {
 
    private void CreateNewPage() {
       currentPage = new LevelSelectPage();
-      currentPage.SetActive(false);
       pages.Add(currentPage);
    }
 
    //Makes the left and right buttons active or inactive as appropriate.
    private void SetButtonActivity() {
-      MenuManager.SetButtonActive(leftButton, (currentPageNumber > 1));
-      MenuManager.SetButtonActive(rightButton, (currentPageNumber < numPages));
+      MenuManager.SetButtonActive(leftButton, (currentPageNumber > 0));
+      MenuManager.SetButtonActive(rightButton, (currentPageNumber < numPages - 1));
    }
 }
 
@@ -87,32 +104,35 @@ public class LevelSelectPage {
    private readonly Vector2 TOP_LEFT = new Vector2(-TILE_X, TILE_Y);
    private readonly Vector2 BOTTOM_LEFT = new Vector2(-TILE_X, -TILE_Y);
 
-   private int tileCount; //Keeps track of how many tiles have been placed on the page, to catch when it is full.
+   //Keeps track of how many tiles have been placed on the page, to catch when it is full.
+   public int TileCount { get; private set; }
+
    private Vector2[] tilePositons;
    private List<LevelSelectTile> tiles;
 
    public LevelSelectPage() {
+      TileCount = 0;
       tilePositons = new Vector2[TILES_PER_PAGE] { TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT };
       tiles = new List<LevelSelectTile>();
    }
 
    //Try to add a tile to the page. If the page is full, return false to indicate as such.
    public bool TryAddTile(LevelSelectTile tile) {
-      if(tileCount >= TILES_PER_PAGE) {
+      if(TileCount >= TILES_PER_PAGE) {
          return false;
       }
 
-      ++tileCount;
-      tile.GetComponent<RectTransform>().localPosition = tilePositons[tileCount - 1];
+      ++TileCount;
+      tile.GetComponent<RectTransform>().localPosition = tilePositons[TileCount - 1];
       tiles.Add(tile);
 
       return true;
    }
 
    //Determines whether the page is displayed or not.
-   public void SetActive(bool active) {
+   public void SetInteractive(bool interactive) {
       foreach(LevelSelectTile tile in tiles) {
-         tile.gameObject.SetActive(active);
+         tile.gameObject.SetActive(interactive);
       }
    }
 }

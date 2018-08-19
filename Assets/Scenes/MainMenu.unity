@@ -152,13 +152,9 @@ Prefab:
       propertyPath: m_RootOrder
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 1391357851088574, guid: ea37789fd04e3db44b76a7e827c64c29, type: 2}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1880706091265638, guid: ea37789fd04e3db44b76a7e827c64c29, type: 2}
-      propertyPath: m_IsActive
-      value: 1
+    - target: {fileID: 1869776978330564, guid: ea37789fd04e3db44b76a7e827c64c29, type: 2}
+      propertyPath: m_Name
+      value: LevelCompletePopup
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ea37789fd04e3db44b76a7e827c64c29, type: 2}
@@ -1423,6 +1419,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   continueButton: {fileID: 594165313}
+  levelSelectButton: {fileID: 1469298461}
 --- !u!1 &1931289726
 GameObject:
   m_ObjectHideFlags: 0
