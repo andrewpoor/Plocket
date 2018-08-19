@@ -4,11 +4,11 @@ using UnityEngine;
 
 public class HomingEnemy : EnemyType {
 
-   public float speed;
+   [SerializeField] private float speed;
 
    void FixedUpdate () {
       //Move directly towards the player.
-      Vector2 direction = GameManager.Instance.player.transform.position - transform.position;
+      Vector2 direction = GameManager.Instance.Player.transform.position - transform.position;
       transform.Translate (direction.normalized * speed * Time.deltaTime);
    }
 

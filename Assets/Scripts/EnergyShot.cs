@@ -4,11 +4,12 @@ using UnityEngine;
 
 public class EnergyShot : MonoBehaviour {
 
-   public float speed;
+
    public int damage;
 
-   private Animator animator;
-   private CircleCollider2D circleCollider;
+   [SerializeField] private float speed;
+   [SerializeField] private Animator animator;
+   [SerializeField] private CircleCollider2D circleCollider;
 
    void Start() {
       animator = GetComponent<Animator> ();

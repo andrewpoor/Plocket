@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class RailEnemy : EnemyType {
 
-   public float speed;
-   public Vector2 direction;
+   [SerializeField] private float speed;
+   [SerializeField] private Vector2 direction;
 
    void FixedUpdate () {
       transform.Translate (direction.normalized * speed * Time.deltaTime);

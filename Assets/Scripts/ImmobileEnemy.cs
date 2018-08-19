@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class ImmobileEnemy : EnemyType {
 
-   public float hoveringDisplacement; //Controls how much the enemy oscillates.
-   public float hoveringSpeed; //The speed of oscillation.
+   [SerializeField] private float hoveringDisplacement; //Controls how much the enemy oscillates.
+   [SerializeField] private float hoveringSpeed; //The speed of oscillation.
 
    private Vector2 startingPosition;
 

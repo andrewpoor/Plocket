@@ -6,15 +6,15 @@ public class Rocket : MonoBehaviour {
 
    private const float SPIN_DEGREES = 360.0f;
 
-   public AudioClip launchAudio;
-   public AudioClip fireAudio;
-   public AudioClip explodeAudio;
-
    public float launchingSpeed; //Speed when initially coming out of the boss.
    public float firingSpeed; //Speed when firing towards the player.
    public float numberSpins; //Number of spins the rocket does before firing towards the player.
    public float spinSpeed; //At a rate of spins per second.
    public Vector2 initialDisplacement; //Amount the rocket flies out of the boss before changing directions for the player.
+
+   [SerializeField] private AudioClip launchAudio;
+   [SerializeField] private AudioClip fireAudio;
+   [SerializeField] private AudioClip explodeAudio;
 
    private Animator animator;
    private PolygonCollider2D polygonCollider;
@@ -48,7 +48,7 @@ public class Rocket : MonoBehaviour {
 
       //Spin to face the player
       startingAngle = transform.rotation.eulerAngles.z;
-      Vector3 rocketToPlayer = GameManager.Instance.player.transform.position - transform.position;
+      Vector3 rocketToPlayer = GameManager.Instance.Player.transform.position - transform.position;
       targetAngle = NormaliseAngle(Mathf.Atan2(rocketToPlayer.y, rocketToPlayer.x) * Mathf.Rad2Deg - 90.0f); //-90 accounts for sprite forward being off 90 degrees.
       totalTime = (Mathf.Abs(startingAngle - targetAngle) / SPIN_DEGREES) / spinSpeed;
       yield return StartCoroutine(Turn(startingAngle, targetAngle, totalTime));

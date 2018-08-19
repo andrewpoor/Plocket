@@ -264,7 +264,7 @@ Prefab:
     - target: {fileID: 114706573750193228, guid: 43a6b7e1703c465469bcc2a7460a7eb3,
         type: 2}
       propertyPath: health
-      value: 50
+      value: 300
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 43a6b7e1703c465469bcc2a7460a7eb3, type: 2}

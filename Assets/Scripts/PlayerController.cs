@@ -4,24 +4,24 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour {
 
-   public GameObject laserCooldownPrefab;
-   public GameObject energyShotPrefab;
-   public AudioClip movingAudio;
-   public AudioClip explodingAudio;
-   public AudioClip warpingAudio;
+   [HideInInspector] public bool Alive { get; private set; }
+   [HideInInspector] public float TimePlayed { get; private set; } //Duration the plocket has been moving for.
 
-   public float maxSpeed; //Speed of plocket once it has fully accelerated.
-   public float accelerationTime; //Time in seconds to reach max speed from a standstill.
-   public float rotationSpeed;
-   public float pullToExitSpeed; //Speed at which the player is pulled to the exit upon touching it.
-   public float shotRechargeDelay;
-   public float movingAudioVolume;
-   public LayerMask blockingLayer;
-   public int laserDamage;
-   public int shotDamage;
+   [SerializeField] private GameObject laserCooldownPrefab;
+   [SerializeField] private GameObject energyShotPrefab;
+   [SerializeField] private AudioClip movingAudio;
+   [SerializeField] private AudioClip explodingAudio;
+   [SerializeField] private AudioClip warpingAudio;
 
-   [HideInInspector] public bool alive { get; private set; }
-   [HideInInspector] public float timePlayed { get; private set; } //Duration the plocket has been moving for.
+   [SerializeField] private float maxSpeed; //Speed of plocket once it has fully accelerated.
+   [SerializeField] private float accelerationTime; //Time in seconds to reach max speed from a standstill.
+   [SerializeField] private float rotationSpeed;
+   [SerializeField] private float pullToExitSpeed; //Speed at which the player is pulled to the exit upon touching it.
+   [SerializeField] private float shotRechargeDelay;
+   [SerializeField] private float movingAudioVolume;
+   [SerializeField] private LayerMask blockingLayer;
+   [SerializeField] private int laserDamage;
+   [SerializeField] private int shotDamage;
 
    private bool playerReady = false; //Used to make the rocket only move when the player is ready.
    private bool lockMovement = false; //Used by the game to allow or disallow rocket movement regardless of player input.
@@ -49,7 +49,7 @@ public class PlayerController : MonoBehaviour {
       laserCooldown.playerControler = this;
       shotOffset = (GetComponent<Renderer> ().bounds.size.y / 2.0f) * Vector2.up;
       GameManager.Instance.RegisterPlayer (this);
-      alive = true;
+      Alive = true;
 
       StartCoroutine (WaitUntilPlayerReady ());
 	}
@@ -76,7 +76,7 @@ public class PlayerController : MonoBehaviour {
 
    void LateUpdate() {
       if (timing) {
-         timePlayed += Time.deltaTime;
+         TimePlayed += Time.deltaTime;
       }
 
       if(Input.GetButton("Fire1") && shotReady && !lockMovement) {
@@ -184,7 +184,7 @@ public class PlayerController : MonoBehaviour {
       polygonCollider.enabled = false;
       laserCooldown.gameObject.SetActive(false);
       timing = false;
-      alive = false;
+      Alive = false;
       PlayAudio (explodingAudio);
       animator.SetTrigger ("Explode"); //Event trigger at end calls EndDestruction
    }
@@ -245,7 +245,7 @@ public class PlayerController : MonoBehaviour {
    }
 
    private void StartTimer() {
-      timePlayed = 0.0f;
+      TimePlayed = 0.0f;
       timing = true;
    }
 

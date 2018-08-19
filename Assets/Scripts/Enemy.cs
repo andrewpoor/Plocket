@@ -84,7 +84,7 @@ public class Enemy : MonoBehaviour, IDamageable {
       GetComponent<Animator>().enabled = false;
       FinishedExplodeAnimation = true;
 
-      if(GameManager.Instance.player.alive && registerWithManager) {
+      if(GameManager.Instance.Player.Alive && registerWithManager) {
          GameManager.Instance.EnemyDestroyed(this);
       }
    }

@@ -15,44 +15,44 @@ public class Boss : EnemyType {
    };
 
    [Header("References")]
-   public Enemy summonedEnemyPrefab;
-   public Rocket rocketPrefab;
-   public GameObject laserPrefab;
-   public AudioClip dormantTheme;
-   public AudioClip battleTheme;
-   public AudioClip wakingSound;
-   public AudioClip defeatedSound;
-   public AudioClip shaking;
-   public AudioClip summoningDrones;
-   public AudioClip chargingLaser;
-   public AudioClip firingLaser;
-   public Image healthBarMeter;
+   [SerializeField] private Enemy summonedEnemyPrefab;
+   [SerializeField] private Rocket rocketPrefab;
+   [SerializeField] private GameObject laserPrefab;
+   [SerializeField] private AudioClip dormantTheme;
+   [SerializeField] private AudioClip battleTheme;
+   [SerializeField] private AudioClip wakingSound;
+   [SerializeField] private AudioClip defeatedSound;
+   [SerializeField] private AudioClip shaking;
+   [SerializeField] private AudioClip summoningDrones;
+   [SerializeField] private AudioClip chargingLaser;
+   [SerializeField] private AudioClip firingLaser;
+   [SerializeField] private Image healthBarMeter;
 
    [Header("Movement")]
-   public float shakeDisplacement;
-   public float shakeDuration;
-   public int shakeOscillations;
-   public float firstShakeDuration;
-   public int firstShakeOscillations;
-   public float speed;
+   [SerializeField] private float shakeDisplacement;
+   [SerializeField] private float shakeDuration;
+   [SerializeField] private int shakeOscillations;
+   [SerializeField] private float firstShakeDuration;
+   [SerializeField] private int firstShakeOscillations;
+   [SerializeField] private float speed;
 
    [Header("Rockets")]
-   public float timeBetweenRockets;
-   public float rocketDisplacementX;
-   public float rocketDisplacementY;
+   [SerializeField] private float timeBetweenRockets;
+   [SerializeField] private float rocketDisplacementX;
+   [SerializeField] private float rocketDisplacementY;
 
    [Header("Laser")]
-   public float laserTurnAngleCorner;
-   public float laserDurationCorner;
-   public float laserTurnAngleCentre;
-   public float laserDurationCentre;
-   public float laserCooldownDuration;
-   public float laserTurnBackDuration;
+   [SerializeField] private float laserTurnAngleCorner;
+   [SerializeField] private float laserDurationCorner;
+   [SerializeField] private float laserTurnAngleCentre;
+   [SerializeField] private float laserDurationCentre;
+   [SerializeField] private float laserCooldownDuration;
+   [SerializeField] private float laserTurnBackDuration;
 
    [Header("General")]
-   public int startingPositionIndex; //See diagram below.
-   public float timeBetweenActions;
-   public float timerVariance; //The time between actions is randomised by this amount after each action.
+   [SerializeField] private int startingPositionIndex; //See diagram below.
+   [SerializeField] private float timeBetweenActions;
+   [SerializeField] private float timerVariance; //The time between actions is randomised by this amount after each action.
 
    /* Transform positions for the boss's various states.
     * Positions are numbered as below:
