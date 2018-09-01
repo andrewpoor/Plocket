@@ -18,7 +18,7 @@ public class LevelSelectTile : MonoBehaviour {
    public void SetTileVariables(LevelData data, Sprite newThumbnail) {
       thumbnail.GetComponent<Image>().sprite = newThumbnail;
       levelTitle.text = data.sceneName;
-      completionTime.text = COMPLETION_TIME_PREFIX + GameManager.TimeTakenForLevel(data.completionTimeRaw);
+      completionTime.text = COMPLETION_TIME_PREFIX + PlacardManager.TimeTakenForLevel(data.completionTimeRaw);
       levelSceneNumber = data.sceneNumber;
       levelSelectButton.enabled = true;
    }

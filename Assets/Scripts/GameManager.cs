@@ -17,18 +17,6 @@ public class GameManager : MonoBehaviour {
       LevelSelectMenu
    };
 
-   private const string WIN_TEXT = "Level Complete!";
-   private const string WIN_SUBTITLE = "Click to Continue";
-   private const string LOSE_TEXT = "You crashed.";
-   private const string LOSE_SUBTITLE = "Click to Continue";
-   private const string GAME_COMPLETE_TEXT = "You have beaten the game!";
-   private const string GAME_COMPLETE_SUBTITLE = "Levels cleared: ";
-   private const string TIME_TAKEN_DISPLAY = "Time taken: ";
-   private const string TIME_TAKEN_DISPLAY_LAST = "Time taken for this level: ";
-   private const string TIME_TAKEN_HIDE = "";
-   private const string BEST_TIME_DISPLAY = "Best time: ";
-   private const string PREVIOUS_BEST_TIME_DISPLAY = "Previous: ";
-
    //Singleton
    public static GameManager Instance { get; private set; }
 
@@ -42,14 +30,8 @@ public class GameManager : MonoBehaviour {
 
    public List<LevelData> LevelDatas { get { return saveData.GetLevelDatasCopy(); } }
 
-   //Level Complete Popup
    [SerializeField] private GameObject canvas;
-   [SerializeField] private Text title;
-   [SerializeField] private Text subtitle;
-   [SerializeField] private Text timeTaken;
-   [SerializeField] private Text bestTime;
-   [SerializeField] private Text newBestTimeLabel; //Shows when the player's time is a new record for that level.
-   [SerializeField] private Text previousBestTime; //Shows when the player's time is a new record for that level.
+   [SerializeField] private PlacardManager placardManager; //Manages the various placards/menus that appear mid-game.
 
    [SerializeField] private Texture2D cursorTexture; //A crosshair cursor.
    [SerializeField] private AudioClip menuMusic;
@@ -163,13 +145,13 @@ public class GameManager : MonoBehaviour {
    public void LevelComplete() {
       canvas.SetActive (true);
       Player.enabled = false;
-      string timeTaken = TimeTakenForLevel(Player.TimePlayed);
-      string previousBestTime = timeTaken;
+      float timeTaken = Player.TimePlayed;
+      float previousBestTime = timeTaken;
 
       //Check if a record time already existed in the save data.
       int index = CurrentSceneNumber - firstLevelSceneNumber;
       if (index < saveData.levelDatas.Count) {
-         previousBestTime = TimeTakenForLevel(saveData.levelDatas[index].completionTimeRaw);
+         previousBestTime = saveData.levelDatas[index].completionTimeRaw;
       }
 
       //Record the data for the current level, and check if this is a new best time for the level.
@@ -183,7 +165,7 @@ public class GameManager : MonoBehaviour {
             saveData.currentSceneNumber = CurrentSceneNumber + 1; //If the player were to stop here, they'd resume at the start of the next level.
             SaveGame();
 
-            EditLevelEndPopup(WIN_TEXT, WIN_SUBTITLE, timeTaken, previousBestTime, newTimeRecord);
+            placardManager.DisplayLevelEndPlacard(timeTaken, previousBestTime, newTimeRecord);
 
             StartCoroutine(WaitUntilLevelChange());
          } else {
@@ -191,13 +173,13 @@ public class GameManager : MonoBehaviour {
             saveData.currentSceneNumber = firstLevelSceneNumber;
             SaveGame();
 
-            EditLevelEndPopup(GAME_COMPLETE_TEXT, GAME_COMPLETE_SUBTITLE, timeTaken, previousBestTime, newTimeRecord);
+            placardManager.DisplayGameCompletePlacard(timeTaken, previousBestTime, newTimeRecord, saveData.levelDatas.Count);
 
             StartCoroutine(WaitUntilReturnToMainMenu());
          }
       } else {
          SaveGame();
-         EditLevelEndPopup(WIN_TEXT, WIN_SUBTITLE, timeTaken, previousBestTime, newTimeRecord);
+         placardManager.DisplayLevelEndPlacard(timeTaken, previousBestTime, newTimeRecord);
          StartCoroutine(WaitUntilReturnToMainMenu());
       }  
    }
@@ -225,7 +207,7 @@ public class GameManager : MonoBehaviour {
    public void GameOver() {
       canvas.SetActive(true);
 
-      //TODO: Enable gameover popup here and disable others.
+      placardManager.DisplayCrashPlacard();
 
       StartCoroutine(WaitUntilRestart());
    }
@@ -238,26 +220,13 @@ public class GameManager : MonoBehaviour {
       }
    }
 
-   //Setup the various texts on the popup that shows up when a level is completed. 
-   private void DisplayLevelEndPopup(string title, string subtitle, string timeTaken, string previousBestTime, bool newRecord) {
-      //TODO: Enable level end popup here and disable others.
-
-      this.title.text = title;
-      this.subtitle.text = subtitle;
-      this.timeTaken.text = TIME_TAKEN_DISPLAY + timeTaken;
-      this.bestTime.text = BEST_TIME_DISPLAY + (newRecord ? timeTaken : previousBestTime);
-      this.previousBestTime.text = "(" + PREVIOUS_BEST_TIME_DISPLAY + previousBestTime + ")";
-
-      this.newBestTimeLabel.enabled = newRecord;
-      this.previousBestTime.enabled = newRecord;
-   }
-
    //Wait for the player to signal that it's time to continue and then advance to the next level.
    private IEnumerator WaitUntilLevelChange() {
       while (!Input.GetButtonDown("Fire1")) {
          yield return null;
       }
 
+      placardManager.HidePlacard();
       LoadLevel(SceneManager.GetActiveScene().buildIndex + 1, true, true);
       yield return null;
    }
@@ -269,6 +238,7 @@ public class GameManager : MonoBehaviour {
          yield return null;
       }
 
+      placardManager.HidePlacard();
       LoadLevel(mainMenuSceneNumber, false);
       yield return null;
    }
@@ -279,6 +249,7 @@ public class GameManager : MonoBehaviour {
          yield return null;
       }
 
+      placardManager.HidePlacard();
       SceneManager.LoadScene (CurrentSceneNumber);
       canvas.SetActive (false);
       SetupNewLevel ();
@@ -287,37 +258,8 @@ public class GameManager : MonoBehaviour {
 
    //Clear up all references to the previous level to prepare for the new one.
    private void SetupNewLevel() {
-      enemies.Clear ();
+      enemies.Clear();
       exit = null;
-   }
-
-   //Returns a formatted representation of the time taken so far in the level.
-   //Format is mm:ss:xxx, where xs are milliseconds.
-   public static string TimeTakenForLevel(float time) {
-      if (time > 3600.0f) {
-         return "59:59:999";
-      }
-
-      int minutes = Mathf.FloorToInt(time / 60.0f);
-      int seconds = Mathf.FloorToInt(time % 60.0f);
-      int milliseconds = Mathf.FloorToInt((time - 60.0f * minutes - seconds) * 1000.0f);
-
-      return FormatTimeDivision(minutes, 2) + ":" + FormatTimeDivision(seconds, 2) + ":" + FormatTimeDivision(milliseconds, 3);
-   }
-
-   //Formats a given fraction of time to add 0s to the front if needed.
-   //E.g. 9 seconds is two units (as its max is 59 seconds) and returns "09"
-   private static string FormatTimeDivision(int timeRaw, int numUnits) {
-      string zeroes = "";
-      int units = 10; //start in the second column, as no need to place a zero in the first, the raw time will handle that
-      for (int i = 0; i < numUnits - 1; i++) {
-         if (timeRaw < units) {
-            zeroes += "0";
-         }
-         units *= 10;
-      }
-
-      return zeroes + timeRaw;
    }
 
    //Record information about the currently completed level, such as completion time.
