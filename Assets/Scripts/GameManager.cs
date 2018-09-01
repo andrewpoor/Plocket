@@ -29,8 +29,7 @@ public class GameManager : MonoBehaviour {
    public bool ContinueExists { get { return saveData.continueGame; } }
 
    public List<LevelData> LevelDatas { get { return saveData.GetLevelDatasCopy(); } }
-
-   [SerializeField] private GameObject canvas;
+   
    [SerializeField] private PlacardManager placardManager; //Manages the various placards/menus that appear mid-game.
 
    [SerializeField] private Texture2D cursorTexture; //A crosshair cursor.
@@ -58,8 +57,7 @@ public class GameManager : MonoBehaviour {
          Destroy (gameObject);
          return;
       }
-
-      canvas.SetActive(false);
+      
       enemies = new List<Enemy>();
       Cursor.SetCursor(cursorTexture, new Vector2(cursorTexture.width / 2.0f, cursorTexture.height / 2.0f), CursorMode.Auto);
       audioSource = GetComponent<AudioSource>();
@@ -71,6 +69,15 @@ public class GameManager : MonoBehaviour {
    }
 
    void Update() {
+      //Pause the game if the appropriate button is pressed.
+      if(Input.GetButtonDown("Cancel") || Input.GetButtonDown("Fire2")) {
+         if (Time.timeScale > float.Epsilon) {
+            Pause();
+         } else {
+            Unpause();
+         }
+      }
+
       //Developer commands
       bool devKey = Input.GetKey(KeyCode.Keypad8);
       if(devKey && Input.GetKeyDown(KeyCode.Space)) {
@@ -143,7 +150,6 @@ public class GameManager : MonoBehaviour {
 
    //Saves the game and displays the relevant level completion popup for the user.
    public void LevelComplete() {
-      canvas.SetActive (true);
       Player.enabled = false;
       float timeTaken = Player.TimePlayed;
       float previousBestTime = timeTaken;
@@ -192,7 +198,6 @@ public class GameManager : MonoBehaviour {
    // upon completion, and will not impact the main playthrough. New records for the level will be saved, however.
    public void LoadLevel(int levelSceneNumber, bool continueGame, bool continueCurrentMusic = false) {
       SceneManager.LoadScene(levelSceneNumber);
-      canvas.SetActive(false);
       SetupNewLevel();
       inPlaythrough = continueGame;
       MenuLocation = continueGame ? MenuType.MainMenu : MenuType.LevelSelectMenu;
@@ -205,11 +210,27 @@ public class GameManager : MonoBehaviour {
    //For when the player dies.
    //Brings up an appropriate UI popup, giving relevant button options to the player.
    public void GameOver() {
-      canvas.SetActive(true);
-
       placardManager.DisplayCrashPlacard();
 
       StartCoroutine(WaitUntilRestart());
+   }
+
+   private bool PlayerAlive() {
+      if(Player != null) {
+         return Player.Alive;
+      }
+
+      return false;
+   }
+
+   private void Pause() {
+      Time.timeScale = 0.0f;
+      placardManager.DisplayPausePlacard();
+   }
+
+   private void Unpause() {
+      Time.timeScale = 1.0f;
+      placardManager.HidePlacard();
    }
 
    //Chooses the background music for the given level.
@@ -251,7 +272,6 @@ public class GameManager : MonoBehaviour {
 
       placardManager.HidePlacard();
       SceneManager.LoadScene (CurrentSceneNumber);
-      canvas.SetActive (false);
       SetupNewLevel ();
       yield return null;
    }

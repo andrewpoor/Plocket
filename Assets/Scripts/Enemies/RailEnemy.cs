@@ -8,7 +8,9 @@ public class RailEnemy : EnemyType {
    [SerializeField] private Vector2 direction;
 
    void FixedUpdate () {
-      transform.Translate (direction.normalized * speed * Time.deltaTime);
+      if (Time.timeScale > float.Epsilon) {
+         transform.Translate(direction.normalized * speed * Time.deltaTime);
+      }
    }
 
    void OnTriggerEnter2D(Collider2D other) {

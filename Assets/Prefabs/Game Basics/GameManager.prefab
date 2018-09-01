@@ -745,6 +745,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1f9fee4bcb6fb5a48b365bed3e2fe3b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  canvas: {fileID: 1873608698515152}
   pausePlacard: {fileID: 114654496313242304}
   levelEndPlacard: {fileID: 114268152667793084}
   gameCompletePlacard: {fileID: 114080564581552872}
@@ -1236,7 +1237,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bad4787bec0d7554e9b3794a9802591f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  canvas: {fileID: 1873608698515152}
   placardManager: {fileID: 114359976887003900}
   cursorTexture: {fileID: 2800000, guid: 6b875e72d4d34af4c9bd0ccbea8d38e8, type: 3}
   menuMusic: {fileID: 8300000, guid: ba2501ab59ee5cd42a36c25a9de77968, type: 3}

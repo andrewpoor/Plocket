@@ -106,7 +106,7 @@ public class Boss : EnemyType {
 
    //When not performing an action, count down towards performing the next.
    private void Update() {
-      if(!inAction && !dormant) {
+      if(!inAction && !dormant && Time.timeScale > float.Epsilon) {
          actionTimer += Time.deltaTime;
 
          //If it's time, randomise the next action interval and perform an action.

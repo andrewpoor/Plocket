@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class PlacardManager : MonoBehaviour {
 
+   [SerializeField] private GameObject canvas;
+
    [SerializeField] private PausePlacard pausePlacard; //Displayed when pausing the game.
    [SerializeField] private LevelEndPlacard levelEndPlacard; //Displayed when completing most levels.
    [SerializeField] private GameCompletePlacard gameCompletePlacard; //Displayed when completing the final level.
@@ -16,6 +18,8 @@ public class PlacardManager : MonoBehaviour {
       levelEndPlacard.gameObject.SetActive(false);
       gameCompletePlacard.gameObject.SetActive(false);
       crashPlacard.gameObject.SetActive(false);
+
+      canvas.SetActive(false);
    }
 
    public void DisplayPausePlacard() {
@@ -38,6 +42,7 @@ public class PlacardManager : MonoBehaviour {
 
    public void HidePlacard() {
       currentPlacard.gameObject.SetActive(false);
+      canvas.SetActive(false);
    }
 
    //Returns a formatted representation of the time taken so far in the level.
@@ -71,6 +76,8 @@ public class PlacardManager : MonoBehaviour {
 
    //Disable the current placard if necessary, then show the given one and make it current.
    private void DisplayPlacard(MonoBehaviour placard) {
+      canvas.SetActive(true);
+
       if(currentPlacard != null) {
          currentPlacard.gameObject.SetActive(false);
       }

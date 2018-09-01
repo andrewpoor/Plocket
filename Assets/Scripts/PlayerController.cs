@@ -57,7 +57,7 @@ public class PlayerController : MonoBehaviour {
    void FixedUpdate() {
       //When moving, the rocket always moves forwards.
       //It also rotates towards the mouse position.
-      if (playerReady && !lockMovement) {
+      if (playerReady && !lockMovement && Time.timeScale > float.Epsilon) {
 //         //Rotate rocket to point towards the mouse
 //         Vector3 playerToMouse = Input.mousePosition - Camera.main.WorldToScreenPoint (transform.position);
 //         if (playerToMouse.magnitude > GetComponent<Renderer> ().bounds.size.y) {
@@ -79,7 +79,7 @@ public class PlayerController : MonoBehaviour {
          TimePlayed += Time.deltaTime;
       }
 
-      if(Input.GetButton("Fire1") && shotReady && !lockMovement) {
+      if(Input.GetButton("Fire1") && shotReady && !lockMovement && Time.timeScale > float.Epsilon) {
          ShootEnergyShot ();
       }
    }
@@ -87,7 +87,7 @@ public class PlayerController : MonoBehaviour {
    //Until the player has pressed a button to start, the rocket should remain still.
    //Once ready, the rocket will begin to accelerate and control is granted to the player.
    private IEnumerator WaitUntilPlayerReady() {
-      while (!Input.GetButtonDown ("Fire1")) {
+      while (!Input.GetButtonDown ("Fire1") || Time.timeScale < float.Epsilon) {
          yield return null;
       }
 

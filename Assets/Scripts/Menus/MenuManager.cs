@@ -41,10 +41,15 @@ public class MenuManager : MonoBehaviour {
 
       button.interactable = active;
    }
+   
+   public void GoToMainMenu() {
+      GoToMenu(mainMenu);
+   }
 
-   //Public-facing wrapper functions.
-   public void GoToMainMenu() { GoToMenu(mainMenu); }
-   public void GoToLevelSelectMenu() { GoToMenu(levelSelectMenu); }
+   public void GoToLevelSelectMenu() {
+      GoToMenu(levelSelectMenu);
+      levelSelectMenu.GetComponent<LevelSelectMenu>().GoToPage(0);
+   }
 
    //Deactivate the current menu and move to a new one.
    private void GoToMenu(GameObject menu) {
