@@ -27,6 +27,7 @@ public class Boss : EnemyType {
    [SerializeField] private AudioClip chargingLaser;
    [SerializeField] private AudioClip firingLaser;
    [SerializeField] private Image healthBarMeter;
+   [SerializeField] private Image healthBarBorder;
 
    [Header("Movement")]
    [SerializeField] private float shakeDisplacement;
@@ -129,6 +130,7 @@ public class Boss : EnemyType {
       //Set health bar visual.
       if(enemyBehaviour.health <= 0) {
          healthBarMeter.enabled = false;
+         healthBarBorder.enabled = false;
       } else {
          healthBarMeter.rectTransform.localScale = new Vector3(healthBarMax.x * (enemyBehaviour.health / maxHealth), healthBarMax.y, healthBarMax.z);
       }      

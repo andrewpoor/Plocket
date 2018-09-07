@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour {
@@ -31,20 +30,24 @@ public class GameManager : MonoBehaviour {
    public List<LevelData> LevelDatas { get { return saveData.GetLevelDatasCopy(); } }
    
    [SerializeField] private PlacardManager placardManager; //Manages the various placards/menus that appear mid-game.
+   [SerializeField] private AudioSource musicSource;
+   [SerializeField] private AudioSource sfxSource;
 
    [SerializeField] private Texture2D cursorTexture; //A crosshair cursor.
    [SerializeField] private AudioClip menuMusic;
    [SerializeField] private AudioClip levelMusic;
+   [SerializeField] private AudioClip victoryJingle;
+   [SerializeField] private AudioClip victoryMusic;
    [SerializeField] private int firstLevelSceneNumber = 1;
    [SerializeField] private int mainMenuSceneNumber = 0;
 
    private Exit exit;
    private List<Enemy> enemies;
 
-   private AudioSource audioSource;
    private SaveData saveData;
    private string saveDataPath;
-   private bool inPlaythrough; //True if starting a new game or continuing one, false if loading a level by itself.
+   private bool inPlaythrough = true; //True if starting a new game or continuing one, false if loading a level by itself.
+   private float audioOnVolume;
 
    private int CurrentSceneNumber { get { return SceneManager.GetActiveScene().buildIndex; } }
 
@@ -60,17 +63,17 @@ public class GameManager : MonoBehaviour {
       
       enemies = new List<Enemy>();
       Cursor.SetCursor(cursorTexture, new Vector2(cursorTexture.width / 2.0f, cursorTexture.height / 2.0f), CursorMode.Auto);
-      audioSource = GetComponent<AudioSource>();
       SetBackgroundMusic(ChooseBackgroundMusic(CurrentSceneNumber));
       saveDataPath = Application.persistentDataPath + "/saveData.dat";
       MenuLocation = MenuType.MainMenu;
+      audioOnVolume = musicSource.volume;
 
       LoadGame();
    }
 
    void Update() {
       //Pause the game if the appropriate button is pressed.
-      if(Input.GetButtonDown("Cancel") || Input.GetButtonDown("Fire2")) {
+      if((Input.GetButtonDown("Cancel") || Input.GetButtonDown("Fire2")) && PlayerAlive()) {
          if (Time.timeScale > float.Epsilon) {
             Pause();
          } else {
@@ -129,8 +132,8 @@ public class GameManager : MonoBehaviour {
    }
 
    public void SetBackgroundMusic(AudioClip clip) {
-      audioSource.clip = clip;
-      audioSource.Play();
+      musicSource.clip = clip;
+      musicSource.Play();
    }
 
    //Start a new game from the first level
@@ -180,13 +183,16 @@ public class GameManager : MonoBehaviour {
             SaveGame();
 
             placardManager.DisplayGameCompletePlacard(timeTaken, previousBestTime, newTimeRecord, saveData.levelDatas.Count);
+            SetBackgroundMusic(victoryMusic);
+            sfxSource.clip = victoryJingle;
+            sfxSource.Play();
 
-            StartCoroutine(WaitUntilReturnToMainMenu());
+            StartCoroutine(WaitUntilReturnToMenu(true));
          }
       } else {
          SaveGame();
          placardManager.DisplayLevelEndPlacard(timeTaken, previousBestTime, newTimeRecord);
-         StartCoroutine(WaitUntilReturnToMainMenu());
+         StartCoroutine(WaitUntilReturnToMenu(false));
       }  
    }
 
@@ -197,7 +203,6 @@ public class GameManager : MonoBehaviour {
    //If continueGame is false, the level is treated as being played in isolation. It will return to leve select
    // upon completion, and will not impact the main playthrough. New records for the level will be saved, however.
    public void LoadLevel(int levelSceneNumber, bool continueGame, bool continueCurrentMusic = false) {
-      SceneManager.LoadScene(levelSceneNumber);
       SetupNewLevel();
       inPlaythrough = continueGame;
       MenuLocation = continueGame ? MenuType.MainMenu : MenuType.LevelSelectMenu;
@@ -205,6 +210,14 @@ public class GameManager : MonoBehaviour {
       if(!continueCurrentMusic) {
          SetBackgroundMusic(ChooseBackgroundMusic(levelSceneNumber));
       }
+
+      SceneManager.LoadScene(levelSceneNumber);
+   }
+
+   //If mainMenu is true, return to the main menu. Else return to the level select menu.
+   public void ReturnToMenu(bool mainMenu) {
+      Unpause();
+      LoadLevel(mainMenuSceneNumber, mainMenu);
    }
 
    //For when the player dies.
@@ -215,22 +228,34 @@ public class GameManager : MonoBehaviour {
       StartCoroutine(WaitUntilRestart());
    }
 
+   public void Pause() {
+      Time.timeScale = 0.0f;
+      placardManager.DisplayPausePlacard();
+   }
+
+   public void Unpause() {
+      Time.timeScale = 1.0f;
+      placardManager.HidePlacard();
+   }
+
+   public void QuitGame() {
+#if UNITY_EDITOR
+      UnityEditor.EditorApplication.isPlaying = false;
+#else
+         Application.Quit();
+#endif
+   }
+
+   public void ToggleBackgroundMusic() {
+      musicSource.volume = (musicSource.volume > float.Epsilon) ? 0.0f : audioOnVolume;
+   }
+
    private bool PlayerAlive() {
       if(Player != null) {
          return Player.Alive;
       }
 
       return false;
-   }
-
-   private void Pause() {
-      Time.timeScale = 0.0f;
-      placardManager.DisplayPausePlacard();
-   }
-
-   private void Unpause() {
-      Time.timeScale = 1.0f;
-      placardManager.HidePlacard();
    }
 
    //Chooses the background music for the given level.
@@ -252,15 +277,14 @@ public class GameManager : MonoBehaviour {
       yield return null;
    }
 
-   //Wait for the player to signal that it's time to continue and then return to the main menu.
-   //The MenuLocation property controls which menu in the main menu is opened upon return there.
-   private IEnumerator WaitUntilReturnToMainMenu() {
+   //Wait for the player to signal that it's time to continue and then return to the indicated menu.
+   //When mainMenu is true, return to the main menu. Else return to the level select menu.
+   private IEnumerator WaitUntilReturnToMenu(bool mainMenu) {
       while (!Input.GetButtonDown("Fire1")) {
          yield return null;
       }
 
-      placardManager.HidePlacard();
-      LoadLevel(mainMenuSceneNumber, false);
+      ReturnToMenu(mainMenu);
       yield return null;
    }
 
@@ -280,6 +304,7 @@ public class GameManager : MonoBehaviour {
    private void SetupNewLevel() {
       enemies.Clear();
       exit = null;
+      Player = null;
    }
 
    //Record information about the currently completed level, such as completion time.
@@ -343,14 +368,6 @@ public class GameManager : MonoBehaviour {
 
    private void DeleteSaveData() {
       File.Delete(saveDataPath);
-   }
-
-   private void ToggleBackgroundMusic() {
-      audioSource.enabled = !audioSource.isActiveAndEnabled;
-
-      if (audioSource.isActiveAndEnabled) {
-         audioSource.Play();
-      }
    }
 }
 

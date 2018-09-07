@@ -6,8 +6,7 @@ public class PlayerController : MonoBehaviour {
 
    [HideInInspector] public bool Alive { get; private set; }
    [HideInInspector] public float TimePlayed { get; private set; } //Duration the plocket has been moving for.
-
-   [SerializeField] private GameObject laserCooldownPrefab;
+   
    [SerializeField] private GameObject energyShotPrefab;
    [SerializeField] private AudioClip movingAudio;
    [SerializeField] private AudioClip explodingAudio;
@@ -20,7 +19,6 @@ public class PlayerController : MonoBehaviour {
    [SerializeField] private float shotRechargeDelay;
    [SerializeField] private float movingAudioVolume;
    [SerializeField] private LayerMask blockingLayer;
-   [SerializeField] private int laserDamage;
    [SerializeField] private int shotDamage;
 
    private bool playerReady = false; //Used to make the rocket only move when the player is ready.
@@ -30,14 +28,9 @@ public class PlayerController : MonoBehaviour {
    private float accelerationProgress = 0.0f; //Time in seconds since acceleration begun.
    private float speed = 0.0f; //Current speed.
 
-   #pragma warning disable 0414
-   private bool laserReady = false;
-   #pragma warning restore 0414
-
    private Animator animator;
    private PolygonCollider2D polygonCollider;
    private AudioSource audioSource;
-   private LaserCooldown laserCooldown;
    private Vector2 shotOffset; //Energy shots should be fired from the front end of the rocket.
 
 	// Use this for initialization
@@ -45,8 +38,6 @@ public class PlayerController : MonoBehaviour {
       animator = GetComponent<Animator> ();
       polygonCollider = GetComponent<PolygonCollider2D> ();
       audioSource = GetComponent<AudioSource> ();
-      laserCooldown = GameObject.Instantiate (laserCooldownPrefab, transform).GetComponent<LaserCooldown>();
-      laserCooldown.playerControler = this;
       shotOffset = (GetComponent<Renderer> ().bounds.size.y / 2.0f) * Vector2.up;
       GameManager.Instance.RegisterPlayer (this);
       Alive = true;
@@ -107,52 +98,9 @@ public class PlayerController : MonoBehaviour {
          audioSource.volume = Mathf.Lerp (0.0f, movingAudioVolume, t);
          yield return null;
       }
-
-      laserReady = true;
+      
       shotReady = true;
       yield return null;
-   }
-
-   //Fire a laser in the direction the rocket is pointing.
-   //Begins a cooldown during which the laser can't be fired again.
-   //NOTE: Not currently in use.
-   private void ShootLaser() {
-      laserReady = false;
-      RaycastHit2D hit = Physics2D.Raycast (transform.position, transform.up, 100.0f, blockingLayer);
-      if (hit.transform != null) {
-         DrawLine (transform.position, hit.point, Color.gray, 0.1f, 0.02f);
-
-         if (hit.transform.CompareTag("Damageable")) {
-            IDamageable hitObject = hit.transform.GetComponent<IDamageable>();
-            hitObject.DealDamage (laserDamage);
-         }
-      }
-
-      laserCooldown.StartCooldown ();
-   }
-
-   public void RechargeLaser() {
-      laserReady = true;
-   }
-
-   //Draws a temporary line on screen between start and end.
-   private void DrawLine(Vector2 start, Vector2 end, Color color, float duration, float width)
-   {
-      GameObject lineHolder = new GameObject();
-      lineHolder.transform.position = start;
-      lineHolder.AddComponent<LineRenderer>();
-      LineRenderer line = lineHolder.GetComponent<LineRenderer>();
-
-      line.material = new Material(Shader.Find("Particles/Alpha Blended Premultiply"));
-      line.startColor = color;
-      line.endColor = color;
-      line.startWidth = width;
-      line.endWidth = width;
-      line.SetPosition(0, start);
-      line.SetPosition(1, end);
-      line.sortingLayerName = "Walls";
-
-      GameObject.Destroy(lineHolder, duration);
    }
 
    //Fires a shot towards the current mouse position, independant of the rocket's orientation.
@@ -179,12 +127,7 @@ public class PlayerController : MonoBehaviour {
 
    //Explode and trigger a game over state.
    private void BeginDestruction() {
-      lockMovement = true;
-      laserReady = false;
-      polygonCollider.enabled = false;
-      laserCooldown.gameObject.SetActive(false);
-      timing = false;
-      Alive = false;
+      ImmobilisePlayer();
       PlayAudio (explodingAudio);
       animator.SetTrigger ("Explode"); //Event trigger at end calls EndDestruction
    }
@@ -217,13 +160,16 @@ public class PlayerController : MonoBehaviour {
    //Move the rocket to the exit sprite's centre, then begin the exiting animation, 
    //  before finally transitioning to the next level/screen as appropriate.
    private void BeginExitReached(Transform exitTransform) {
-      lockMovement = true;
-      laserReady = false;
-      polygonCollider.enabled = false;
-      laserCooldown.gameObject.SetActive(false);
-      timing = false;
+      ImmobilisePlayer();
       PlayAudio (warpingAudio);
       StartCoroutine (MoveToExit(exitTransform.position));
+   }
+
+   private void ImmobilisePlayer() {
+      lockMovement = true;
+      polygonCollider.enabled = false;
+      timing = false;
+      Alive = false;
    }
 
    //Smoothly pull the rocket to the exit's centre, and then continue the exit process.

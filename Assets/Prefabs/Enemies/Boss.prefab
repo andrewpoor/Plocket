@@ -8,15 +8,15 @@ Prefab:
     m_TransformParent: {fileID: 0}
     m_Modifications: []
     m_RemovedComponents: []
-  m_ParentPrefab: {fileID: 0}
+  m_SourcePrefab: {fileID: 0}
   m_RootGameObject: {fileID: 1504747522704430}
-  m_IsPrefabParent: 1
+  m_IsPrefabAsset: 1
 --- !u!1 &1504747522704430
 GameObject:
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 5
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 4521934105698894}
   - component: {fileID: 212036937941755590}
@@ -35,7 +35,7 @@ GameObject:
 --- !u!4 &4521934105698894
 Transform:
   m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1504747522704430}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -48,7 +48,7 @@ Transform:
 --- !u!60 &60629497799913782
 PolygonCollider2D:
   m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1504747522704430}
   m_Enabled: 1
@@ -82,7 +82,7 @@ PolygonCollider2D:
 --- !u!82 &82906425915687178
 AudioSource:
   m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1504747522704430}
   m_Enabled: 1
@@ -178,7 +178,7 @@ AudioSource:
 Animator:
   serializedVersion: 3
   m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1504747522704430}
   m_Enabled: 1
@@ -195,7 +195,7 @@ Animator:
 --- !u!114 &114531179827538824
 MonoBehaviour:
   m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1504747522704430}
   m_Enabled: 1
@@ -203,6 +203,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9807ead541b89434381ab3bbd22fdae9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  enemyBehaviour: {fileID: 0}
+  animator: {fileID: 0}
+  audioSource: {fileID: 0}
   summonedEnemyPrefab: {fileID: 114822120839983894, guid: 7e9e5b8d22083be4c98cc24c72b2f042,
     type: 2}
   rocketPrefab: {fileID: 114288030847311842, guid: 18ef50e02c50bbf49b7234c8af447562,
@@ -218,6 +221,7 @@ MonoBehaviour:
   chargingLaser: {fileID: 8300000, guid: aaca2a609d4020a429d5dd0fec292308, type: 3}
   firingLaser: {fileID: 8300000, guid: 204801ef8f40b344b988965a1f051780, type: 3}
   healthBarMeter: {fileID: 0}
+  healthBarBorder: {fileID: 0}
   shakeDisplacement: 0.05
   shakeDuration: 0.8
   shakeOscillations: 8
@@ -239,7 +243,7 @@ MonoBehaviour:
 --- !u!114 &114706573750193228
 MonoBehaviour:
   m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1504747522704430}
   m_Enabled: 1
@@ -255,7 +259,7 @@ MonoBehaviour:
 --- !u!212 &212036937941755590
 SpriteRenderer:
   m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1504747522704430}
   m_Enabled: 1
@@ -297,3 +301,4 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
+  m_SpriteSortPoint: 0

@@ -24,4 +24,8 @@ public class MainMenu : MonoBehaviour {
    public void ContinueGame() {
       GameManager.Instance.ContinueGame();
    }
+
+   public void QuitGame() {
+      GameManager.Instance.QuitGame();
+   }
 }
